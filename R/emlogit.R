@@ -44,8 +44,8 @@ emlogit <- function(Y, X, control = list()) {
 
   n_cov <- ncol(X)
   J     <- ncol(Y)
-  B <- cbind(rep(0, n_cov),
-    matrix(rnorm(n_cov * (J-1)), nrow = n_cov, ncol = J-1))
+  B     <- cbind(rep(0, n_cov),
+                 matrix(rnorm(n_cov * (J-1)), nrow = n_cov, ncol = J-1))
 
   if (!exists("mu0", control)) {
     control$mu0 <- rep(0, ncol(X))

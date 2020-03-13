@@ -173,8 +173,8 @@ void emlogit_estep(
 
 // ------------------------------------------------------------- //
 //                                                               //
-// EM algorithm for the multinomial logit regression             //
-// Based on Polya-Gamma data augmentation scheme                 //
+//      EM algorithm for the multinomial logit regression        //
+//        Based on Polya-Gamma data augmentation scheme          //
 //                                                               //
 // ------------------------------------------------------------- //
 
