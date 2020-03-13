@@ -1,13 +1,13 @@
 Package: emlogit
-Title: What the Package Does (One Line, Title Case)
+Title: Implementing a ECM algorithm for multinomial logit model.
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Soichiro",
+           family = "Yamauchi",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+           email = "syamauchi@g.harvard.edu",
+           comment = c(ORCID = "0000-0003-0554-2717"))
+Description: This package implements a ECM algorithm for multinomial logit model.
 License: What license it uses
 Encoding: UTF-8
 LazyData: true
@@ -16,4 +16,6 @@ LinkingTo:
     Rcpp,
     RcppArmadillo
 Imports: 
-    Rcpp
+    Rcpp,
+    RcppArmadillo,
+    tibble
