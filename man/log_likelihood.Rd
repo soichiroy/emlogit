@@ -6,6 +6,21 @@
 \usage{
 log_likelihood(Y, X, B, mu0, Z0)
 }
+\arguments{
+\item{Y}{A matrix of multinomial outcomes.}
+
+\item{X}{A matrix of covariate matrix.}
+
+\item{B}{A matrix of coefficeints. Cols correspond to choices and rows correspond to variables.}
+
+\item{mu0}{A vector of prior means.}
+
+\item{Z0}{A matrix of prior variance covariance matrix.}
+}
+\value{
+A double of log-likelihood evaluated at \code{B}.
+}
 \description{
 observed log-likelihood
 }
+\keyword{internal}

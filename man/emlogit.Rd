@@ -7,7 +7,7 @@
 emlogit(Y, X, control = list())
 }
 \arguments{
-\item{Y}{A matrix of multinomial outcome where rows correspond to observations
+\item{Y}{A matrix of multinomial outcomes where rows correspond to observations
 and columns correspond to choices.}
 
 \item{X}{A matrix of covariates where columns correspond to variables.
@@ -20,7 +20,7 @@ The number of rows should match with the number of rows for \code{Y}.}
   \item \code{tol} A tolerance parameter for assessing the convergence. Default value is 1e-5.
   \item \code{mu0} A vector of prior means. The dimension of this parameter should match with the dimension of \code{X} (i.e., the nmber of variables).
    The default value is \code{0}.
-  \item \code{Z0} A matrix for the prior variance covariance matrix. 
+  \item \code{Z0} A matrix for the prior variance covariance matrix.
      The dimension of this matrix should match with the dimension of \code{X} i.e., the nmber of variables).
      The default vaue is \code{diag(rep(5, ncol(X)))}
   \item \code{verbose} A boolean argument. If set \code{TRUE}, the function shows the log-posterior for each iteration. Default is \code{FALSE}.

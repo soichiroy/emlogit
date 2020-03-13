@@ -9,7 +9,7 @@
 //                                                               //
 // ------------------------------------------------------------- //
 
-// log-sum-exp for a arma::rowvec input 
+// log-sum-exp for a arma::rowvec input
 // @param in_vec A reference pass of arma::rowvec.
 // @returns A double of log(sum(exp(in_vec))).
 double lse_rv (
@@ -46,10 +46,10 @@ arma::vec sum_exp_beta(const arma::mat &XB) {
 
 
 
-// log density of multivariate normal 
+// log density of multivariate normal
 // @param Y A matrix of outcome variables. Rows are observations and cols are variable dimensions.
-// @param mu A vector of means. 
-// @param Z Variance covariace matrix. 
+// @param mu A vector of means.
+// @param Z Variance covariace matrix.
 // @return A arma::rowvec of evaluated densities.
 arma::rowvec log_normalpdf(
   const arma::mat &Y,
@@ -78,12 +78,12 @@ arma::rowvec log_normalpdf(
 
 //' observed log-likelihood
 //' @param Y A matrix of multinomial outcomes.
-//' @param X A matrix of covariate matrix. 
+//' @param X A matrix of covariate matrix.
 //' @param B A matrix of coefficeints. Cols correspond to choices and rows correspond to variables.
-//' @param mu0 A vector of prior means. 
+//' @param mu0 A vector of prior means.
 //' @param Z0 A matrix of prior variance covariance matrix.
 //' @return A double of log-likelihood evaluated at \code{B}.
-//' @keyword internal
+//' @keywords internal
 // [[Rcpp::export]]
 double log_likelihood (
   const arma::mat &Y,
@@ -155,7 +155,7 @@ arma::vec compute_psi(
   return out;
 }
 
-// Compute expected 
+// Compute expected
 void emlogit_estep(
   const arma::mat &X,
   const arma::mat &B,
@@ -179,7 +179,7 @@ void emlogit_estep(
 // ------------------------------------------------------------- //
 
 //' EM implementation
-//' @keyword internal
+//' @keywords internal
 // [[Rcpp::export]]
 arma::mat emlogit_run(
   const arma::mat &Y,
@@ -197,10 +197,10 @@ arma::mat emlogit_run(
   int    iter     = 0;
   arma::mat omega = arma::zeros(Y.n_rows, Y.n_cols);
   double ll_old   = log_likelihood(Y, X, B, mu0, Z0);
-  
+
   // EM updates
   while((iter < max_iter) & (eval > tol)) {
-    // E-step -------------------------------------- // 
+    // E-step -------------------------------------- //
     emlogit_estep(X, B, omega);
 
     // M-step -------------------------------------- //
