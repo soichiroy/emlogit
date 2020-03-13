@@ -44,31 +44,52 @@ arma::vec sum_exp_beta(const arma::mat &XB) {
   return denom;
 }
 
+//' Predicted probability
+//' @param X A matrix of covariates.
+//' @param B A matrix of coefficeints including the reference category.
+//' @keywords internal
+// [[Rcpp::export]]
+arma::mat predict_prob(
+  const arma::mat &X,
+  const arma::mat &B
+) {
 
+  arma::mat XB = X * B;
+  arma::vec denom = sum_exp_beta(XB);
+  arma::mat prob(X.n_rows, B.n_cols);
+
+  for (int i = 0; i < X.n_rows; i++) {
+    prob.row(i) = exp(XB.row(i)) / denom(i);
+  }
+
+  return prob;
+}
 
 // log density of multivariate normal
 // @param Y A matrix of outcome variables. Rows are observations and cols are variable dimensions.
 // @param mu A vector of means.
 // @param Z Variance covariace matrix.
 // @return A arma::rowvec of evaluated densities.
-arma::rowvec log_normalpdf(
+arma::vec log_normalpdf(
   const arma::mat &Y,
-  const arma::rowvec &mu,
+  const arma::vec &mu,
   const arma::mat &Z
 ) {
 
   // compute det(Z)
   double dZ = arma::det(Z);
-  int k = Y.n_cols;
-  arma::rowvec density(Y.n_rows);
-  for (int i = 0; i < Y.n_rows; i++) {
-    double A = -log(2.0 * arma::datum::pi) * static_cast<double>(k);
-    double B = -log(dZ);
+  int k = Y.n_rows;
+  arma::vec density(Y.n_cols-1);
+  double A = -log(2.0 * arma::datum::pi) * static_cast<double>(k);
+  double B = -log(dZ);
+
+  // first col is always fixed to 0
+  for (int i = 1; i < Y.n_cols; i++) {
     double C = arma::accu(
-      -(Y.row(i) - mu) * arma::solve(Z, arma::trans(Y.row(i) - mu))
+      -arma::trans(Y.col(i) - mu) * arma::solve(Z, (Y.col(i) - mu))
     );
 
-    density(i) = (A + B + C) / 2.0;
+    density(i-1) = (A + B + C) / 2.0;
   }
 
   return density;
@@ -102,7 +123,7 @@ double log_likelihood (
   }
 
   // add prior contribution
-  ll += arma::accu(log_normalpdf(B, mu0.t(), Z0));
+  ll += arma::accu(log_normalpdf(B, mu0, Z0));
 
   return ll;
 }
@@ -195,7 +216,7 @@ arma::mat emlogit_run(
 
   double eval     = 1.0;
   int    iter     = 0;
-  arma::mat omega = arma::zeros(Y.n_rows, Y.n_cols);
+  arma::mat omega = arma::zeros(Y.n_rows, Y.n_cols-1);
   double ll_old   = log_likelihood(Y, X, B, mu0, Z0);
 
   // EM updates
@@ -220,4 +241,41 @@ arma::mat emlogit_run(
   }
 
   return B;
+}
+
+
+
+// ------------------------------------------------------------- //
+//                  Computing Variance                           //
+// ------------------------------------------------------------- //
+//' @keywords internal
+// [[Rcpp::export]]
+arma::mat emlogit_var(
+  const arma::mat &Y,
+  const arma::mat &X,
+  const arma::mat &B,
+  const arma::vec &mu0,
+  const arma::mat &Z0
+) {
+
+  // comupute
+  // create a score "matrix" (K by J)
+  arma::mat score_mat = arma::zeros(X.n_cols, B.n_cols-1);
+
+  arma::mat XB = X * B;
+  arma::vec denom = sum_exp_beta(XB);
+  for (int j = 1; j < B.n_cols; j++) {
+    score_mat.col(j-1) = X.t() * (Y.col(j) - exp(XB.col(j)) / denom) +
+                          arma::solve(Z0, (mu0 - B.col(j)));
+  }
+
+  // compute hessian (K by K)
+  arma::vec score = arma::vectorise(score_mat);
+  arma::mat ESS = score * score.t() / X.n_rows;
+  // arma::vec var = arma::diagvec(arma::inv_sympd(H));
+  //
+  //
+  // arma::mat var_mat = arma::reshape(var, X.n_cols, B.n_cols);
+  // return score_mat;
+  return ESS;
 }

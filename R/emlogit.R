@@ -24,25 +24,38 @@
 #' @export
 emlogit <- function(Y, X, control = list()) {
 
-  # max_iter = 200, tol = 1e-5, verbose = FALSE, intercept = TRUE)
-  control <- input_check(control, ncol(X))
+  ## setup ------------------------------------------------------------
+  control <- input_check(control)
   if (isTRUE(control$intercept)) {
     X <- cbind(rep(1, nrow(X)), X)
   }
 
+  control <- specify_prior(control, ncol(X))
   B <- coef_initialize(Y, X)
 
-  fit <- emlogit_run(
+  ## estimate coefficeints using EM -----------------------------------
+  coef <- emlogit_run(
       Y = Y, X = X, B = B,
       tol = control$tol, max_iter = control$max_iter,
       mu0 = control$mu0, Z0 = control$Z0, verbose = control$verbose
     )
 
+  ## compute variance of coefficeints ---------------------------------
+  var <- emlogit_var(Y, X, B, control$mu0, control$Z0)
+
+  ## obtain the in-sample fit -----------------------------------------
+  prob <- predict_prob(X, coef)
+  fit <- list(coef = coef, var = var, prob = prob, control = control)
+
   class(fit) <- c("emlogit", "emlogit.est")
   return(fit)
 }
 
-input_check <- function(control, n_cov) {
+
+#' Input check
+#' A function to set the default values of \code{control}.
+#' @keywords internal
+input_check <- function(control) {
   if (!exists("max_iter", control)) {
     control$max_iter <- 200
   }
@@ -55,6 +68,15 @@ input_check <- function(control, n_cov) {
     control$verbose = FALSE
   }
 
+  if (!exists("intercept", control)) {
+    control$intercept <- TRUE
+  }
+  return(control)
+}
+
+#' Specify the prior
+#' @keywords internal
+specify_prior <- function(control, n_cov) {
   if (!exists("mu0", control)) {
     control$mu0 <- rep(0, n_cov)
   }
@@ -62,14 +84,11 @@ input_check <- function(control, n_cov) {
   if (!exists("Z0", control)) {
     control$Z0 <- diag(rep(5, n_cov))
   }
-
-  if (!exists("intercept", control)) {
-    control$intercept <- TRUE
-  }
   return(control)
 }
 
-
+#' Initialize coefficeints
+#' @keywords
 coef_initialize <- function(Y, X) {
   n_cov <- ncol(X)
   J     <- ncol(Y)
