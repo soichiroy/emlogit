@@ -9,3 +9,4 @@ coef_initialize(Y, X)
 \description{
 Initialize coefficeints
 }
+\keyword{internal}

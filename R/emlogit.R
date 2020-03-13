@@ -88,7 +88,7 @@ specify_prior <- function(control, n_cov) {
 }
 
 #' Initialize coefficeints
-#' @keywords
+#' @keywords internal
 coef_initialize <- function(Y, X) {
   n_cov <- ncol(X)
   J     <- ncol(Y)
