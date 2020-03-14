@@ -18,22 +18,38 @@ print.summary.emlogit <- function(obj) {
 summary.emlogit <- function(obj) {
   if ("emlogit.est" %in% class(obj)) {
 
+    ## create a matrix of se 
+    se_mat <- sqrt(obj$var)
+    
+    
     ## create a long coef
-    colnames(obj$coef) <- paste("`", 1:ncol(obj$coef), "`", sep = "")
+    if (is.null(obj$y_name)) {
+      colnames(obj$coef) <- paste("`", 1:ncol(obj$coef), "`", sep = "")      
+      colnames(se_mat)   <- paste("`", 2:ncol(obj$coef), "`", sep = "")      
+    } else {
+      colnames(obj$coef) <- obj$y_name
+      colnames(se_mat)   <- obj$y_name[-1]
+    }
+    
+    if (is.null(obj$x_name)) {
+      coef_name <- 1:nrow(obj$coef)
+    } else {
+      if (isTRUE(obj$control$intercept)) obj$x_name[1] <- "intercept"
+      coef_name <- obj$x_name
+    }
+
     coef_long <- tibble::as_tibble(obj$coef[,-1]) %>%
-      mutate(betas = 1:nrow(obj$coef)) %>%
+      mutate(betas = coef_name) %>%
       tidyr::pivot_longer(-betas, names_to = "category", values_to = "estimate")
 
     ## create a long form se
-    se_mat <- sqrt(obj$var)
-    colnames(se_mat) <- paste("`", 2:ncol(obj$coef), "`", sep = "")
     var_long <- tibble::as_tibble(se_mat) %>%
-      mutate(betas = 1:nrow(se_mat)) %>%
+      mutate(betas = coef_name) %>%
       tidyr::pivot_longer(-betas, names_to = "category", values_to = "se")
     tab <- coef_long %>%
       left_join(var_long, by = c("category", "betas")) %>%
       select(category, everything()) %>%
-      arrange(category, betas)
+      arrange(category)
   } else {
     stop("Not a supported input.")
   }

@@ -53,3 +53,16 @@ summary(fit)
 prob <- predict(fit)
 head(prob)
 ```
+
+
+```{r}
+## multinomial outcome 
+data(japan, package = "MNP")
+head(japan)
+
+Y <- japan %>% select(LDP, NFP, SKG, JCP) %>% data.matrix()
+X <- japan %>% select(gender, education, age) %>% data.matrix()
+
+fit <- emlogit(Y = Y, X = X)
+summary(fit)
+```

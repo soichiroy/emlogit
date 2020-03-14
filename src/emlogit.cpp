@@ -139,6 +139,7 @@ void emlogit_mstep(
   const arma::mat &Y,
   const arma::mat &X,
         arma::mat &B,
+  const arma::vec &ni,
   const arma::mat &omega,
   const arma::mat &mu0,
   const arma::mat &Z0
@@ -150,7 +151,7 @@ void emlogit_mstep(
     arma::vec eXB = sum_exp_beta(XB);
     arma::mat SS  = X.t() * arma::diagmat(omega.col(j-1)) * X;
     arma::vec di  = log(eXB - exp(XB.col(j))) % omega.col(j-1) +
-                      (Y.col(j) - 0.5);
+                      (Y.col(j) - ni / 2.0);
     // update beta[j] | beta[-j]
     B.col(j) = arma::solve(SS + arma::inv_sympd(Z0),
                            X.t() * di + arma::solve(Z0, mu0));
@@ -180,6 +181,7 @@ arma::vec compute_psi(
 void emlogit_estep(
   const arma::mat &X,
   const arma::mat &B,
+  const arma::vec &ni,
   arma::mat &omega
 ) {
 
@@ -187,7 +189,7 @@ void emlogit_estep(
   arma::vec eXB = sum_exp_beta(XB);
   for (int j = 1; j < B.n_cols; j++) {
     arma::vec psi  = compute_psi(XB, eXB, j);
-    omega.col(j-1) =  tanh(psi / 2.0) / (2.0 * psi);
+    omega.col(j-1) =  tanh(psi / 2.0) % ni / (2.0 * psi);
   }
 }
 
@@ -218,14 +220,15 @@ arma::mat emlogit_run(
   int    iter     = 0;
   arma::mat omega = arma::zeros(Y.n_rows, Y.n_cols-1);
   double ll_old   = log_likelihood(Y, X, B, mu0, Z0);
+  arma::vec  ni   = arma::sum(Y, 1);
 
   // EM updates
   while((iter < max_iter) & (eval > tol)) {
     // E-step -------------------------------------- //
-    emlogit_estep(X, B, omega);
+    emlogit_estep(X, B, ni, omega);
 
     // M-step -------------------------------------- //
-    emlogit_mstep(Y, X, B, omega, mu0, Z0);
+    emlogit_mstep(Y, X, B, ni, omega, mu0, Z0);
 
     // evaluate log-likelihood --------------------- //
     if (verbose) {
@@ -269,19 +272,19 @@ arma::mat emlogit_var(
   arma::vec denom = sum_exp_beta(XB);
   for (int j = 1; j < B.n_cols; j++) {
     arma::vec tmp = exp(XB.col(j)) / denom;
-    arma::vec tmp_n = Y.col(j) - tmp;
+    arma::vec tmp_n = Y.col(j) % (1.0 - tmp);
     arma::vec prior_score = arma::solve(Z0, (mu0 - B.col(j)));
     
     // compute the hessian 
-    arma::mat H = -X.t() * arma::diagmat((1.0 - tmp) % tmp) * X + arma::inv_sympd(Z0);
+    arma::mat H = -X.t() * arma::diagmat((1.0 - tmp) % tmp) * X + arma::inv(Z0);
 
     if (robust) {
       // --- robust version --- //
       arma::mat SS = X.t() * arma::diagmat(arma::pow(tmp_n, 2)) * X + prior_score * prior_score.t();
-      var_mat.col(j-1) = arma::diagvec( arma::solve(H, SS) * arma::inv_sympd(H) );      
+      var_mat.col(j-1) = arma::diagvec( arma::solve(H, SS) * arma::inv(H) );      
     } else {
       // --- usual variance based on the Fisher information matrix --- //
-      var_mat.col(j-1) = -arma::diagvec( arma::inv_sympd(H) );      
+      var_mat.col(j-1) = -arma::diagvec( arma::inv(H) );      
     }
   }
 

@@ -18,10 +18,10 @@ The number of rows should match with the number of rows for \code{Y}.}
   \item \code{max_iter} A integer value that specifies the maximum iterations
   for the EM algorithm. Defaul value is 200.
   \item \code{tol} A tolerance parameter for assessing the convergence. Default value is 1e-5.
-  \item \code{mu0} A vector of prior means. The dimension of this parameter should match with the dimension of \code{X} (i.e., the nmber of variables).
+  \item \code{mu0} A vector of prior means. The dimension of this parameter should match with the dimension of \code{X} (i.e., the number of variables).
    The default value is \code{0}.
   \item \code{Z0} A matrix for the prior variance covariance matrix.
-     The dimension of this matrix should match with the dimension of \code{X} i.e., the nmber of variables).
+     The dimension of this matrix should match with the dimension of \code{X} i.e., the number of variables).
      The default vaue is \code{diag(rep(5, ncol(X)))}
   \item \code{verbose} A boolean argument. If set \code{TRUE}, the function shows the log-posterior for each iteration. Default is \code{FALSE}.
   \item \code{intercept} A boolean argument. When \code{X} already contains the intercept term (i.e., a column of ones), this option should \code{FALSE}.
