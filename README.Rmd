@@ -51,7 +51,11 @@ summary(fit)
 
 ## predicted probability
 prob <- predict(fit)
-head(prob)
+```
+
+```{r echo=FALSE}
+head(prob) %>% 
+  knitr::kable(digit = 3)
 ```
 
 
@@ -63,9 +67,14 @@ head(japan)
 Y <- japan %>% select(LDP, NFP, SKG, JCP) %>% data.matrix()
 X <- japan %>% select(gender, education, age) %>% data.matrix()
 
+set.seed(1234)
 fit <- emlogit(Y = Y, X = X)
 summary(fit)
 
 pred <- predict(fit)
-head(pred)
+```
+
+```{r echo=FALSE}
+head(prob) %>% 
+  knitr::kable(digit = 3)
 ```
