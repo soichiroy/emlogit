@@ -26,9 +26,10 @@ knitr::opts_chunk$set(
 
 1. [Installation](#installation)
 2. [Examples](#examples)
-  a. [Categorical outcome](#categorical-outcome)
-  b. [Multinomial outcome](#multinomial-outcome)
-  c. [Binary (binomial) outcome (logit)](#binary-outcome)
+
+    a. [Categorical outcome](#categorical-outcome)
+    b. [Multinomial outcome](#multinomial-outcome)
+    c. [Binary (binomial) outcome (logit)](#binary-outcome)
 
 
 ## Installation

@@ -16,13 +16,12 @@ regression.
 ## Table of Contents
 
 1.  [Installation](#installation)
+
 2.  [Examples](#examples)
-
-<!-- end list -->
-
-1.  [Categorical outcome](#categorical-outcome)
-2.  [Multinomial outcome](#multinomial-outcome)
-3.  [Binary (binomial) outcome (logit)](#binary-outcome)
+    
+    1.  [Categorical outcome](#categorical-outcome)
+    2.  [Multinomial outcome](#multinomial-outcome)
+    3.  [Binary (binomial) outcome (logit)](#binary-outcome)
 
 ## Installation
 
@@ -60,24 +59,24 @@ summary(fit)
 #>    <chr>         <chr>        <dbl>  <dbl>
 #>  1 choicechoice2 intercept -1.10    0.148 
 #>  2 choicechoice2 college   -0.132   0.149 
-#>  3 choicechoice2 hsg2       0.452   0.139 
-#>  4 choicechoice2 coml5     -0.311   0.138 
+#>  3 choicechoice2 hsg2       0.451   0.139 
+#>  4 choicechoice2 coml5     -0.312   0.138 
 #>  5 choicechoice3 intercept  0.478   0.0779
-#>  6 choicechoice3 college   -0.00281 0.0788
-#>  7 choicechoice3 hsg2      -0.0961  0.0807
+#>  6 choicechoice3 college   -0.00277 0.0788
+#>  7 choicechoice3 hsg2      -0.0966  0.0807
 #>  8 choicechoice3 coml5     -0.114   0.0684
 #>  9 choicechoice4 intercept -0.915   0.132 
 #> 10 choicechoice4 college   -0.140   0.131 
-#> 11 choicechoice4 hsg2       0.569   0.121 
+#> 11 choicechoice4 hsg2       0.568   0.121 
 #> 12 choicechoice4 coml5     -0.166   0.120 
 #> 13 choicechoice5 intercept  0.624   0.0739
 #> 14 choicechoice5 college   -0.161   0.0743
-#> 15 choicechoice5 hsg2      -0.0458  0.0774
-#> 16 choicechoice5 coml5      0.0932  0.0653
+#> 15 choicechoice5 hsg2      -0.0463  0.0774
+#> 16 choicechoice5 coml5      0.0929  0.0653
 #> 17 choicechoice6 intercept -0.901   0.132 
 #> 18 choicechoice6 college   -0.393   0.132 
-#> 19 choicechoice6 hsg2       0.513   0.130 
-#> 20 choicechoice6 coml5     -0.00984 0.124
+#> 19 choicechoice6 hsg2       0.512   0.130 
+#> 20 choicechoice6 coml5     -0.0101  0.124
 
 ## predicted probability
 prob <- predict(fit)
@@ -91,10 +90,10 @@ head(prob) %>%
 | choicechoice1 | choicechoice2 | choicechoice3 | choicechoice4 | choicechoice5 | choicechoice6 |
 | ------------: | ------------: | ------------: | ------------: | ------------: | ------------: |
 |         0.178 |         0.059 |         0.287 |         0.071 |         0.332 |         0.072 |
-|         0.189 |         0.064 |         0.247 |         0.099 |         0.315 |         0.086 |
-|         0.162 |         0.085 |         0.238 |         0.115 |         0.290 |         0.110 |
+|         0.190 |         0.064 |         0.247 |         0.099 |         0.315 |         0.086 |
+|         0.163 |         0.085 |         0.238 |         0.115 |         0.290 |         0.110 |
 |         0.183 |         0.045 |         0.263 |         0.062 |         0.374 |         0.073 |
-|         0.162 |         0.085 |         0.238 |         0.115 |         0.290 |         0.110 |
+|         0.163 |         0.085 |         0.238 |         0.115 |         0.290 |         0.110 |
 |         0.178 |         0.059 |         0.287 |         0.071 |         0.332 |         0.072 |
 
 ### Multinomial outcome
