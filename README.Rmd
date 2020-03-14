@@ -32,7 +32,7 @@ devtools::install_github("sou412/emlogit")
 ## Example
 
 
-```{r}
+```{r warning = FALSE, message = FALSE}
 require(emlogit)
 require(dplyr)
 data(Car, package = 'mlogit')
@@ -41,8 +41,14 @@ data(Car, package = 'mlogit')
 y <- Car %>% select(choice)
 Y <- model.matrix(~choice-1, data = y)
 X <- Car %>% select(college, hsg2, coml5) %>% data.matrix()
+```
 
+```{r}
 ## fit
 fit <- emlogit(Y = Y, X = X)
 summary(fit)
+
+## predicted probability
+prob <- predict(fit)
+head(prob)
 ```
