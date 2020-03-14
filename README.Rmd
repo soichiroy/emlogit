@@ -16,7 +16,6 @@ knitr::opts_chunk$set(
 # emlogit
 
 <!-- badges: start -->
-
 [![Travis build status](https://travis-ci.org/sou412/emlogit.svg?branch=master)](https://travis-ci.org/sou412/emlogit)
 <!-- badges: end -->
 
@@ -85,3 +84,9 @@ pred <- predict(fit)
 head(pred) %>% 
   knitr::kable(digit = 3)
 ```
+
+
+### Binary outcome (logistic regression)
+
+Since the binomial outcome is a specific case of multinomial outcomes, 
+`emlogit` can handle the binomial outcome.
