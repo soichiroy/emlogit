@@ -42,7 +42,7 @@ emlogit <- function(Y, X, control = list()) {
     )
 
   ## compute variance of coefficeints ---------------------------------
-  var <- emlogit_var(Y, X, B, control$mu0, control$Z0)
+  var <- emlogit_var(Y, X, coef, control$mu0, control$Z0)
 
   ## obtain the in-sample fit -----------------------------------------
   prob <- predict_prob(X, coef)
