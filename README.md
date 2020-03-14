@@ -4,7 +4,8 @@ emlogit
 =======
 
 <!-- badges: start -->
-<!-- badges: end -->
+[![Travis build status](https://travis-ci.org/sou412/emlogit.svg?branch=master)](https://travis-ci.org/sou412/emlogit) <!-- badges: end -->
+
 `emlogit` is a **R** package that implements the EM algorithm for the multinomial logistic regression.
 
 Installation
@@ -14,7 +15,7 @@ You can install the development version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("sou412/emlogit")
+devtools::install_github("soichiroy/emlogit")
 ```
 
 Example
@@ -45,23 +46,23 @@ summary(fit)
 #>  1 choicechoice2 intercept -1.10    0.148 
 #>  2 choicechoice2 college   -0.132   0.149 
 #>  3 choicechoice2 hsg2       0.452   0.139 
-#>  4 choicechoice2 coml5     -0.311   0.138 
+#>  4 choicechoice2 coml5     -0.312   0.138 
 #>  5 choicechoice3 intercept  0.478   0.0779
-#>  6 choicechoice3 college   -0.00266 0.0788
-#>  7 choicechoice3 hsg2      -0.0962  0.0807
+#>  6 choicechoice3 college   -0.00277 0.0788
+#>  7 choicechoice3 hsg2      -0.0961  0.0807
 #>  8 choicechoice3 coml5     -0.114   0.0684
-#>  9 choicechoice4 intercept -0.916   0.132 
+#>  9 choicechoice4 intercept -0.915   0.132 
 #> 10 choicechoice4 college   -0.140   0.131 
-#> 11 choicechoice4 hsg2       0.568   0.121 
+#> 11 choicechoice4 hsg2       0.569   0.121 
 #> 12 choicechoice4 coml5     -0.166   0.120 
 #> 13 choicechoice5 intercept  0.624   0.0739
 #> 14 choicechoice5 college   -0.161   0.0743
-#> 15 choicechoice5 hsg2      -0.0459  0.0774
-#> 16 choicechoice5 coml5      0.0932  0.0653
+#> 15 choicechoice5 hsg2      -0.0458  0.0774
+#> 16 choicechoice5 coml5      0.0931  0.0653
 #> 17 choicechoice6 intercept -0.901   0.132 
 #> 18 choicechoice6 college   -0.393   0.132 
 #> 19 choicechoice6 hsg2       0.513   0.130 
-#> 20 choicechoice6 coml5     -0.00978 0.124
+#> 20 choicechoice6 coml5     -0.00987 0.124
 
 ## predicted probability
 prob <- predict(fit)
@@ -76,9 +77,9 @@ head(prob) %>%
 |--------------:|--------------:|--------------:|--------------:|--------------:|--------------:|
 |          0.178|          0.059|          0.287|          0.071|          0.332|          0.072|
 |          0.189|          0.064|          0.247|          0.099|          0.315|          0.086|
-|          0.163|          0.085|          0.238|          0.115|          0.290|          0.110|
+|          0.162|          0.085|          0.238|          0.115|          0.290|          0.110|
 |          0.183|          0.045|          0.263|          0.062|          0.374|          0.073|
-|          0.163|          0.085|          0.238|          0.115|          0.290|          0.110|
+|          0.162|          0.085|          0.238|          0.115|          0.290|          0.110|
 |          0.178|          0.059|          0.287|          0.071|          0.332|          0.072|
 
 ### Multinomial outcome
