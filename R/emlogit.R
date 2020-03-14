@@ -20,6 +20,8 @@
 #'   \item \code{verbose} A boolean argument. If set \code{TRUE}, the function shows the log-posterior for each iteration. Default is \code{FALSE}.
 #'   \item \code{intercept} A boolean argument. When \code{X} already contains the intercept term (i.e., a column of ones), this option should \code{FALSE}.
 #'      Default is \code{TRUE}.
+#'   \item \code{variance} A boolean argument. If \code{FALSE}, \code{emlogit()} skips the variance calculation. 
+#'      This is useful when calling \code{emlogit()} from other programs. Default is \code{TRUE}.
 #' }
 #' @export
 emlogit <- function(Y, X, control = list()) {
@@ -42,7 +44,11 @@ emlogit <- function(Y, X, control = list()) {
     )
 
   ## compute variance of coefficeints ---------------------------------
-  var <- emlogit_var(Y, X, coef, control$mu0, control$Z0, control$robust)
+  if (isTRUE(control$variance)) {
+    var <- emlogit_var(Y, X, coef, control$mu0, control$Z0, control$robust)
+  } else {
+    var <- NULL
+  }
 
   ## obtain the in-sample fit -----------------------------------------
   prob <- predict_prob(X, coef)
@@ -76,7 +82,11 @@ input_check <- function(control) {
 
   if (!exists("robust", control)) {
     control$robust <- FALSE
-  }  
+  }
+  
+  if (!exists("variance", control)) {
+    control$variance <- TRUE
+  }
   return(control)
 }
 
