@@ -75,6 +75,6 @@ pred <- predict(fit)
 ```
 
 ```{r echo=FALSE}
-head(prob) %>% 
+head(pred) %>% 
   knitr::kable(digit = 3)
 ```
