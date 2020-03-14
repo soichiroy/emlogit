@@ -52,8 +52,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // emlogit_var
-arma::mat emlogit_var(const arma::mat& Y, const arma::mat& X, const arma::mat& B, const arma::vec& mu0, const arma::mat& Z0);
-RcppExport SEXP _emlogit_emlogit_var(SEXP YSEXP, SEXP XSEXP, SEXP BSEXP, SEXP mu0SEXP, SEXP Z0SEXP) {
+arma::mat emlogit_var(const arma::mat& Y, const arma::mat& X, const arma::mat& B, const arma::vec& mu0, const arma::mat& Z0, const bool& robust);
+RcppExport SEXP _emlogit_emlogit_var(SEXP YSEXP, SEXP XSEXP, SEXP BSEXP, SEXP mu0SEXP, SEXP Z0SEXP, SEXP robustSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -62,7 +62,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const arma::mat& >::type B(BSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type mu0(mu0SEXP);
     Rcpp::traits::input_parameter< const arma::mat& >::type Z0(Z0SEXP);
-    rcpp_result_gen = Rcpp::wrap(emlogit_var(Y, X, B, mu0, Z0));
+    Rcpp::traits::input_parameter< const bool& >::type robust(robustSEXP);
+    rcpp_result_gen = Rcpp::wrap(emlogit_var(Y, X, B, mu0, Z0, robust));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -71,7 +72,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_emlogit_predict_prob", (DL_FUNC) &_emlogit_predict_prob, 2},
     {"_emlogit_log_likelihood", (DL_FUNC) &_emlogit_log_likelihood, 5},
     {"_emlogit_emlogit_run", (DL_FUNC) &_emlogit_emlogit_run, 8},
-    {"_emlogit_emlogit_var", (DL_FUNC) &_emlogit_emlogit_var, 5},
+    {"_emlogit_emlogit_var", (DL_FUNC) &_emlogit_emlogit_var, 6},
     {NULL, NULL, 0}
 };
 

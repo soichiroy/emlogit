@@ -46,7 +46,7 @@ X <- Car %>% select(college, hsg2, coml5) %>% data.matrix()
 
 ```{r}
 ## fit
-fit <- emlogit(Y = Y, X = X)
+fit <- emlogit(Y = Y, X = X, control = list(robust = FALSE))
 summary(fit)
 
 ## predicted probability

@@ -256,27 +256,33 @@ arma::mat emlogit_var(
   const arma::mat &X,
   const arma::mat &B,
   const arma::vec &mu0,
-  const arma::mat &Z0
+  const arma::mat &Z0,
+  const bool &robust
 ) {
 
   // comupute
   // create a score "matrix" (K by J)
-  arma::mat score_mat = arma::zeros(X.n_cols, B.n_cols-1);
-  arma::mat var_mat   = arma::zeros(X.n_cols, B.n_cols-1);
-
-  arma::mat XB = X * B;
+  // arma::mat score_mat = arma::zeros(X.n_cols, B.n_cols-1);
+  arma::mat var_mat = arma::zeros(X.n_cols, B.n_cols-1);
+  
+  arma::mat XB = X * B;  
   arma::vec denom = sum_exp_beta(XB);
   for (int j = 1; j < B.n_cols; j++) {
-    score_mat.col(j-1) = X.t() * (Y.col(j) - exp(XB.col(j)) / denom) +
-                          arma::solve(Z0, (mu0 - B.col(j)));
     arma::vec tmp = exp(XB.col(j)) / denom;
+    arma::vec tmp_n = Y.col(j) - tmp;
+    arma::vec prior_score = arma::solve(Z0, (mu0 - B.col(j)));
+    
+    // compute the hessian 
     arma::mat H = -X.t() * arma::diagmat((1.0 - tmp) % tmp) * X + arma::inv_sympd(Z0);
 
-    var_mat.col(j-1) = -arma::diagvec( arma::inv_sympd(H) );
-
-    // --- robust version --- //
-    // arma::mat SS = score_mat.col(j-1) * arma::trans(score_mat.col(j-1)) / X.n_rows;
-    // var_mat.col(j-1) = arma::diagvec( arma::solve(H, SS) * arma::inv_sympd(H) );
+    if (robust) {
+      // --- robust version --- //
+      arma::mat SS = X.t() * arma::diagmat(arma::pow(tmp_n, 2)) * X + prior_score * prior_score.t();
+      var_mat.col(j-1) = arma::diagvec( arma::solve(H, SS) * arma::inv_sympd(H) );      
+    } else {
+      // --- usual variance based on the Fisher information matrix --- //
+      var_mat.col(j-1) = -arma::diagvec( arma::inv_sympd(H) );      
+    }
   }
 
   // compute hessian (K by K)
