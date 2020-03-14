@@ -28,3 +28,21 @@ You can install the development version from [GitHub](https://github.com/) with:
 # install.packages("devtools")
 devtools::install_github("sou412/emlogit")
 ```
+
+## Example
+
+
+```{r}
+require(emlogit)
+require(dplyr)
+data(Car, package = 'mlogit')
+
+## prepare data: only allow for indiviual specific covariates
+y <- Car %>% select(choice)
+Y <- model.matrix(~choice-1, data = y)
+X <- Car %>% select(college, hsg2, coml5) %>% data.matrix()
+
+## fit
+fit <- emlogit(Y = Y, X = X)
+summary(fit)
+```
