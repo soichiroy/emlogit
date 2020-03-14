@@ -24,6 +24,11 @@ knitr::opts_chunk$set(
 
 ## Table of Contents
 
+1. [Installation](#installation)
+2. [Examples](#examples)
+  a. [Categorical outcome](#categorical-outcome)
+  b. [Multinomial outcome](#multinomial-outcome)
+  c. [Binary (binomial) outcome (logit)](#binary-outcome)
 
 
 ## Installation
@@ -35,7 +40,7 @@ You can install the development version from [GitHub](https://github.com/) with:
 devtools::install_github("soichiroy/emlogit")
 ```
 
-## Example
+## Examples
 
 ### Categorical outcome
 
@@ -91,7 +96,7 @@ head(pred) %>%
 ```
 
 
-### Binary outcome (logistic regression)
+### Binary outcome
 
 Since the binomial outcome is a special case of multinomial outcomes,
 `emlogit` can handle the binomial outcome.
@@ -108,13 +113,13 @@ prob  <- 1 / (1 + exp(- 0.5 - X %*% betas))
 
 ## generate outcome
 ybin <- rbinom(n = 5000, size = 1, prob = prob)
-Y <- model.matrix(~ factor(ybin) - 1)
+Y    <- model.matrix(~ factor(ybin) - 1)
 
 ## fit
 fit <- emlogit(Y = Y, X = X)
 
 
-## check 
+## check
 betas <- c(0.5, betas)
 cbind(true = betas, estimate = summary(fit)$estimate) %>%
   knitr::kable(digit = 3)
