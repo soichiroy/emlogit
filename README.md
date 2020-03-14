@@ -7,7 +7,8 @@
 
 <!-- badges: end -->
 
-The goal of emlogit is to …
+`emlogit` implements the EM algorithm for the multinomial logistic
+regression.
 
 ## Installation
 
@@ -18,7 +19,3 @@ You can install the development version from
 # install.packages("devtools")
 devtools::install_github("sou412/emlogit")
 ```
-
-## Example
-
-This is a basic example which shows you how to solve a common problem:
