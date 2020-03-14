@@ -31,6 +31,7 @@ devtools::install_github("sou412/emlogit")
 
 ## Example
 
+`Car` data from `mlogit` package.
 
 ```{r warning = FALSE, message = FALSE}
 require(emlogit)

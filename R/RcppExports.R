@@ -27,6 +27,7 @@ emlogit_run <- function(Y, X, B, tol, max_iter, mu0, Z0, verbose) {
     .Call('_emlogit_emlogit_run', PACKAGE = 'emlogit', Y, X, B, tol, max_iter, mu0, Z0, verbose)
 }
 
+#' Variance computation
 #' @keywords internal
 emlogit_var <- function(Y, X, B, mu0, Z0) {
     .Call('_emlogit_emlogit_var', PACKAGE = 'emlogit', Y, X, B, mu0, Z0)

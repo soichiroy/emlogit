@@ -205,7 +205,7 @@ void emlogit_estep(
 arma::mat emlogit_run(
   const arma::mat &Y,
   const arma::mat &X,
-        arma::mat B,
+        arma::mat &B,
   const double    &tol,
   const int       &max_iter,
   const arma::vec &mu0,

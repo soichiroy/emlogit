@@ -34,14 +34,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // emlogit_run
-arma::mat emlogit_run(const arma::mat& Y, const arma::mat& X, arma::mat B, const double& tol, const int& max_iter, const arma::vec& mu0, const arma::mat& Z0, const bool& verbose);
+arma::mat emlogit_run(const arma::mat& Y, const arma::mat& X, arma::mat& B, const double& tol, const int& max_iter, const arma::vec& mu0, const arma::mat& Z0, const bool& verbose);
 RcppExport SEXP _emlogit_emlogit_run(SEXP YSEXP, SEXP XSEXP, SEXP BSEXP, SEXP tolSEXP, SEXP max_iterSEXP, SEXP mu0SEXP, SEXP Z0SEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const arma::mat& >::type Y(YSEXP);
     Rcpp::traits::input_parameter< const arma::mat& >::type X(XSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type B(BSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type B(BSEXP);
     Rcpp::traits::input_parameter< const double& >::type tol(tolSEXP);
     Rcpp::traits::input_parameter< const int& >::type max_iter(max_iterSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type mu0(mu0SEXP);
