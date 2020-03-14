@@ -21,6 +21,11 @@ knitr::opts_chunk$set(
 
 `emlogit` is a **R** package that implements the Expectation and Conditional-Maximization (ECM) algorithm for the multinomial logistic regression.
 
+
+## Table of Contents
+
+
+
 ## Installation
 
 You can install the development version from [GitHub](https://github.com/) with:
@@ -32,7 +37,7 @@ devtools::install_github("soichiroy/emlogit")
 
 ## Example
 
-### Categorical outcome 
+### Categorical outcome
 
 `Car` data from `mlogit` package.
 
@@ -57,16 +62,16 @@ prob <- predict(fit)
 ```
 
 ```{r}
-head(prob) %>% 
+head(prob) %>%
   knitr::kable(digit = 3)
 ```
 
-### Multinomial outcome 
+### Multinomial outcome
 
 `japan` data from `MNP` package.
 
 ```{r}
-## multinomial outcome 
+## multinomial outcome
 data(japan, package = "MNP")
 head(japan)
 
@@ -81,12 +86,36 @@ pred <- predict(fit)
 ```
 
 ```{r}
-head(pred) %>% 
+head(pred) %>%
   knitr::kable(digit = 3)
 ```
 
 
 ### Binary outcome (logistic regression)
 
-Since the binomial outcome is a specific case of multinomial outcomes, 
+Since the binomial outcome is a special case of multinomial outcomes,
 `emlogit` can handle the binomial outcome.
+
+
+```{r}
+set.seed(1234)
+
+## generate X and pi(X)
+betas <- rnorm(4)
+X     <- MASS::mvrnorm(5000, mu = rep(0, length(betas)), Sigma = diag(length(betas)))
+
+prob  <- 1 / (1 + exp(- 0.5 - X %*% betas))
+
+## generate outcome
+ybin <- rbinom(n = 5000, size = 1, prob = prob)
+Y <- model.matrix(~ factor(ybin) - 1)
+
+## fit
+fit <- emlogit(Y = Y, X = X)
+
+
+## check 
+betas <- c(0.5, betas)
+cbind(true = betas, estimate = summary(fit)$estimate) %>%
+  knitr::kable(digit = 3)
+```

@@ -18,19 +18,19 @@ print.summary.emlogit <- function(obj) {
 summary.emlogit <- function(obj) {
   if ("emlogit.est" %in% class(obj)) {
 
-    ## create a matrix of se 
+    ## create a matrix of se
     se_mat <- sqrt(obj$var)
-    
-    
+
+
     ## create a long coef
     if (is.null(obj$y_name)) {
-      colnames(obj$coef) <- paste("`", 1:ncol(obj$coef), "`", sep = "")      
-      colnames(se_mat)   <- paste("`", 2:ncol(obj$coef), "`", sep = "")      
+      colnames(obj$coef) <- paste("`", 1:ncol(obj$coef), "`", sep = "")
+      colnames(se_mat)   <- paste("`", 2:ncol(obj$coef), "`", sep = "")
     } else {
       colnames(obj$coef) <- obj$y_name
       colnames(se_mat)   <- obj$y_name[-1]
     }
-    
+
     if (is.null(obj$x_name)) {
       coef_name <- 1:nrow(obj$coef)
     } else {
@@ -38,7 +38,7 @@ summary.emlogit <- function(obj) {
       coef_name <- obj$x_name
     }
 
-    coef_long <- tibble::as_tibble(obj$coef[,-1]) %>%
+    coef_long <- tibble::as_tibble(obj$coef[,-1, drop=FALSE]) %>%
       mutate(betas = coef_name) %>%
       tidyr::pivot_longer(-betas, names_to = "category", values_to = "estimate")
 
