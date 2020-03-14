@@ -25,6 +25,7 @@
 emlogit <- function(Y, X, control = list()) {
 
   ## setup ------------------------------------------------------------
+  X <- as.matrix(X)
   control <- input_check(control)
   if (isTRUE(control$intercept)) {
     X <- cbind(rep(1, nrow(X)), X)
@@ -94,6 +95,6 @@ coef_initialize <- function(Y, X) {
   J     <- ncol(Y)
   B     <- cbind(rep(0, n_cov),
                  matrix(rnorm(n_cov * (J-1)), nrow = n_cov, ncol = J-1))
-
+  B <- as.matrix(B)
   return(B)
 }
