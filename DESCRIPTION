@@ -22,3 +22,5 @@ Imports:
 Depends:
     dplyr,
     tidyr
+Suggests: 
+    rmarkdown
