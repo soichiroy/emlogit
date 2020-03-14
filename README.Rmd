@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-`emlogit` implements the EM algorithm for the multinomial logistic regression.
+`emlogit` is a **R** package that implements the EM algorithm for the multinomial logistic regression.
 
 ## Installation
 
@@ -30,6 +30,8 @@ devtools::install_github("sou412/emlogit")
 ```
 
 ## Example
+
+### Categorical outcome 
 
 `Car` data from `mlogit` package.
 
@@ -53,11 +55,14 @@ summary(fit)
 prob <- predict(fit)
 ```
 
-```{r echo=FALSE}
+```{r}
 head(prob) %>% 
   knitr::kable(digit = 3)
 ```
 
+### Multinomial outcome 
+
+`japan` data from `MNP` package.
 
 ```{r}
 ## multinomial outcome 
@@ -74,7 +79,7 @@ summary(fit)
 pred <- predict(fit)
 ```
 
-```{r echo=FALSE}
+```{r}
 head(pred) %>% 
   knitr::kable(digit = 3)
 ```
