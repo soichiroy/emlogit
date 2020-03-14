@@ -29,7 +29,7 @@ knitr::opts_chunk$set(
 
     a. [Categorical outcome](#categorical-outcome)
     b. [Multinomial outcome](#multinomial-outcome)
-    c. [Binary (binomial) outcome (logit)](#binary-outcome)
+    c. [Binary/Binomial outcome (logistic regression)](#binary-outcome)
 
 
 ## Installation
