@@ -75,5 +75,8 @@ predict.emlogit <- function(obj, newdata = NULL) {
     pred <- predict_prob(newdata, obj$coef)
   }
 
+  if (!is.null(obj$control$y_name)) {
+    colnames(pred) <- obj$control$y_name
+  }
   return(pred)
 }
