@@ -65,4 +65,7 @@ X <- japan %>% select(gender, education, age) %>% data.matrix()
 
 fit <- emlogit(Y = Y, X = X)
 summary(fit)
+
+pred <- predict(fit)
+head(pred)
 ```
