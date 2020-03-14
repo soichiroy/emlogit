@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 # emlogit
 
 <!-- badges: start -->
-[![Build Status](https://travis-ci.com/soichiroy/emlogit.svg?token=9kDL249kRuSq995JxCG8&branch=master)](https://travis-ci.com/soichiroy/emlogit)
+[![Build Status](https://travis-ci.com/soichiroy/emlogit.svg?branch=master)](https://travis-ci.com/soichiroy/emlogit)
 <!-- badges: end -->
 
 `emlogit` is a **R** package that implements the Expectation and Conditional-Maximization (ECM) algorithm for the multinomial logistic regression.

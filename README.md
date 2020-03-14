@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 [![Build
-Status](https://travis-ci.com/soichiroy/emlogit.svg?token=9kDL249kRuSq995JxCG8&branch=master)](https://travis-ci.com/soichiroy/emlogit)
+Status](https://travis-ci.com/soichiroy/emlogit.svg?branch=master)](https://travis-ci.com/soichiroy/emlogit)
 <!-- badges: end -->
 
 `emlogit` is a **R** package that implements the Expectation and
@@ -60,9 +60,9 @@ summary(fit)
 #>  1 choicechoice2 intercept -1.10    0.148 
 #>  2 choicechoice2 college   -0.132   0.149 
 #>  3 choicechoice2 hsg2       0.452   0.139 
-#>  4 choicechoice2 coml5     -0.311   0.138 
+#>  4 choicechoice2 coml5     -0.312   0.138 
 #>  5 choicechoice3 intercept  0.478   0.0779
-#>  6 choicechoice3 college   -0.00282 0.0788
+#>  6 choicechoice3 college   -0.00279 0.0788
 #>  7 choicechoice3 hsg2      -0.0961  0.0807
 #>  8 choicechoice3 coml5     -0.114   0.0684
 #>  9 choicechoice4 intercept -0.915   0.132 
@@ -72,11 +72,11 @@ summary(fit)
 #> 13 choicechoice5 intercept  0.624   0.0739
 #> 14 choicechoice5 college   -0.161   0.0743
 #> 15 choicechoice5 hsg2      -0.0458  0.0774
-#> 16 choicechoice5 coml5      0.0932  0.0653
+#> 16 choicechoice5 coml5      0.0931  0.0653
 #> 17 choicechoice6 intercept -0.901   0.132 
 #> 18 choicechoice6 college   -0.393   0.132 
 #> 19 choicechoice6 hsg2       0.513   0.130 
-#> 20 choicechoice6 coml5     -0.00982 0.124
+#> 20 choicechoice6 coml5     -0.00986 0.124
 
 ## predicted probability
 prob <- predict(fit)
