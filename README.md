@@ -4,9 +4,9 @@ emlogit
 =======
 
 <!-- badges: start -->
-[![Travis build status](https://travis-ci.org/sou412/emlogit.svg?branch=master)](https://travis-ci.org/sou412/emlogit) <!-- badges: end -->
+[![Travis build status](https://travis-ci.org/soichiroy/emlogit.svg?branch=master)](https://travis-ci.org/sou412/emlogit) <!-- badges: end -->
 
-`emlogit` is a **R** package that implements the EM algorithm for the multinomial logistic regression.
+`emlogit` is a **R** package that implements the Expectation and Conditional-Maximization (ECM) algorithm for the multinomial logistic regression.
 
 Installation
 ------------
@@ -62,7 +62,7 @@ summary(fit)
 #> 17 choicechoice6 intercept -0.901   0.132 
 #> 18 choicechoice6 college   -0.393   0.132 
 #> 19 choicechoice6 hsg2       0.513   0.130 
-#> 20 choicechoice6 coml5     -0.00977 0.124
+#> 20 choicechoice6 coml5     -0.00979 0.124
 
 ## predicted probability
 prob <- predict(fit)
