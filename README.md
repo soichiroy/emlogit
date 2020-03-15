@@ -64,21 +64,21 @@ summary(fit)
 #>  3 choicechoice2 hsg2       0.452   0.139 
 #>  4 choicechoice2 coml5     -0.312   0.138 
 #>  5 choicechoice3 intercept  0.478   0.0779
-#>  6 choicechoice3 college   -0.00285 0.0788
+#>  6 choicechoice3 college   -0.00286 0.0788
 #>  7 choicechoice3 hsg2      -0.0961  0.0807
 #>  8 choicechoice3 coml5     -0.114   0.0684
 #>  9 choicechoice4 intercept -0.915   0.132 
 #> 10 choicechoice4 college   -0.140   0.131 
-#> 11 choicechoice4 hsg2       0.569   0.121 
+#> 11 choicechoice4 hsg2       0.568   0.121 
 #> 12 choicechoice4 coml5     -0.166   0.120 
 #> 13 choicechoice5 intercept  0.624   0.0739
 #> 14 choicechoice5 college   -0.161   0.0743
-#> 15 choicechoice5 hsg2      -0.0458  0.0774
-#> 16 choicechoice5 coml5      0.0930  0.0653
+#> 15 choicechoice5 hsg2      -0.0459  0.0774
+#> 16 choicechoice5 coml5      0.0931  0.0653
 #> 17 choicechoice6 intercept -0.901   0.132 
 #> 18 choicechoice6 college   -0.393   0.132 
 #> 19 choicechoice6 hsg2       0.513   0.130 
-#> 20 choicechoice6 coml5     -0.0100  0.124
+#> 20 choicechoice6 coml5     -0.00991 0.124
 
 ## predicted probability
 prob <- predict(fit)
@@ -194,9 +194,13 @@ cbind(true = betas, estimate = summary(fit)$estimate) %>%
 The ECM algorithm used in this package utilizes the Polya-Gamma
 augmentation scheme originally developed by Polson et al. (2013).
 Applications to the multinomial outcome in the context of deriving the
-EM algorithm based on Polya-Gamma representation can be found in Russo
-et al. (2018) and Goplerud (2019), among others.
+EM algorithm based on Polya-Gamma representation can be found in Durante
+et al. (2019) and Goplerud (2019), among others.
 
+  - Durante, D., Canale, A., & Rigon, T. (2019). [A nested
+    expectation–maximization algorithm for latent class models with
+    covariates.](https://doi.org/10.1016/j.spl.2018.10.015) *Statistics
+    & Probability Letters,* 146, 97-103.
   - Goplerud, M. (2019). [A Multinomial Framework for Ideal Point
     Estimation.](https://doi.org/10.1017/pan.2018.31) *Political
     Analysis,* 27(1), 69-89.
@@ -204,7 +208,3 @@ et al. (2018) and Goplerud (2019), among others.
     inference for logistic models using Pólya–Gamma latent
     variables.](https://doi.org/10.1080/01621459.2013.829001) *Journal
     of the American Statistical Association,* 108(504), 1339-1349.
-  - Russo, M., Durante, D., & Scarpa, B. (2018). [Bayesian inference on
-    group differences in multivariate categorical
-    data.](https://doi.org/10.1016/j.csda.2018.04.010) *Computational
-    Statistics & Data Analysis,* 126, 136-149.
