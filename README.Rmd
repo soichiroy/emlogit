@@ -31,6 +31,7 @@ knitr::opts_chunk$set(
     b. [Multinomial outcome](#multinomial-outcome)
     c. [Binary/Binomial outcome (logistic regression)](#binary-outcome)
 
+3. [References](#references)
 
 ## Installation
 
@@ -125,3 +126,15 @@ betas <- c(0.5, betas)
 cbind(true = betas, estimate = summary(fit)$estimate) %>%
   knitr::kable(digit = 3)
 ```
+
+
+## References
+
+The ECM algorithm used in this package utilizes the Polya-Gamma augmentation scheme originally developed by Polson et al. (2013).
+Applications to the multinomial outcome in the context of deriving the EM algorithm based on Polya-Gamma representation can be found in Russo et al. (2018) and Goplerud (2019), among others.
+
+
+
++ Goplerud, M. (2019). [A Multinomial Framework for Ideal Point Estimation.](https://doi.org/10.1017/pan.2018.31) _Political Analysis,_ 27(1), 69-89.
++ Polson, N. G., Scott, J. G., & Windle, J. (2013). [Bayesian inference for logistic models using Pólya–Gamma latent variables.](https://doi.org/10.1080/01621459.2013.829001) _Journal of the American Statistical Association,_ 108(504), 1339-1349.
++ Russo, M., Durante, D., & Scarpa, B. (2018). [Bayesian inference on group differences in multivariate categorical data.](https://doi.org/10.1016/j.csda.2018.04.010) _Computational Statistics & Data Analysis,_ 126, 136-149.
