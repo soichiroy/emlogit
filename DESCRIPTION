@@ -1,5 +1,5 @@
 Package: emlogit
-Title: Implementing a ECM algorithm for multinomial logit model.
+Title: Implementing the ECM algorithm for multinomial logit model.
 Version: 0.1.0
 Authors@R:
     person(given = "Soichiro",
