@@ -2,11 +2,11 @@
 % Please edit documentation in R/emlogit.R
 \name{coef_initialize}
 \alias{coef_initialize}
-\title{Initialize coefficeints}
+\title{Initialize coefficeints randomly from \code{rnorm()}.}
 \usage{
-coef_initialize(Y, X)
+coef_initialize(Y, X, control)
 }
 \description{
-Initialize coefficeints
+Initialize coefficeints randomly from \code{rnorm()}.
 }
 \keyword{internal}
