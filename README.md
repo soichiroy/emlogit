@@ -15,8 +15,8 @@ regression.
 
 ## Table of Contents
 
-[Installation](#installation) | [Examples](#examples) |
-[References](#references) |
+| [Installation](#installation) | [Examples](#examples) | [References](#references) |
+| ----------------------------- | --------------------- | ------------------------- |
 
 ## Installation
 
@@ -57,7 +57,7 @@ summary(fit)
 #>  3 choicechoice2 hsg2       0.452   0.139 
 #>  4 choicechoice2 coml5     -0.311   0.138 
 #>  5 choicechoice3 intercept  0.478   0.0779
-#>  6 choicechoice3 college   -0.00281 0.0788
+#>  6 choicechoice3 college   -0.00280 0.0788
 #>  7 choicechoice3 hsg2      -0.0961  0.0807
 #>  8 choicechoice3 coml5     -0.114   0.0684
 #>  9 choicechoice4 intercept -0.915   0.132 
