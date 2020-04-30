@@ -7,7 +7,6 @@
 print.summary.emlogit <- function(obj) {
   # print(obj)
   print_tbl <- getFromNamespace("print.tbl", "tibble")
-  # tibble:::print.tbl(obj)
   print_tbl(obj)
   invisible(obj)
 }
