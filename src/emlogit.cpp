@@ -1,6 +1,7 @@
 // [[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h>
 
+// [[Rcpp::plugins("cpp11")]]
 
 
 // ------------------------------------------------------------- //
@@ -55,14 +56,15 @@ arma::mat predict_prob(
 ) {
 
   arma::mat XB = X * B;
-  arma::vec denom = sum_exp_beta(XB);
-  arma::mat prob(X.n_rows, B.n_cols);
 
-  for (int i = 0; i < X.n_rows; i++) {
-    prob.row(i) = exp(XB.row(i)) / denom(i);
-  }
-
-  return prob;
+  // normalize Xb to exp(Xb[k]) / sum(exp(Xb))
+  auto prob_vec = [](arma::rowvec &vec) {
+    arma::rowvec exp_vec = exp(vec);
+    exp_vec /= sum(exp_vec);
+    return vec = exp_vec;
+  };
+  
+  return XB.each_row( prob_vec );
 }
 
 // log density of multivariate normal

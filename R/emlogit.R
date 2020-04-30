@@ -40,7 +40,7 @@ emlogit <- function(Y, X, control = list()) {
 
   control <- specify_prior(control, ncol(X))
   
-  if (exists(control, "initial_value")) {
+  if (exists("initial_value", control)) {
     ## check input 
     if (!all(dim(control$initial_value) == c(ncol(X), ncol(Y)-1))) stop("Dimension of initial value does not match.")
     B <- control$initial_value
@@ -136,7 +136,8 @@ coef_initialize <- function(Y, X, control) {
                    matrix(rnorm(n_cov * (J-1)), nrow = n_cov, ncol = J-1))
     B <- as.matrix(B)
   } else if (control$initialize == "ls") {
-    B <- solve(t(X) %*% X, t(X) %*% Y)
+    B <- solve(t(X) %*% X, t(X) %*% Y);
+    B[,1] <- 0
   }
 
   return(B)
