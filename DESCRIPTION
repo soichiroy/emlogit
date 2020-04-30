@@ -1,24 +1,28 @@
 Package: emlogit
-Title: Implementing a ECM algorithm for multinomial logit model.
-Version: 0.0.0.9000
-Authors@R: 
+Title: Implementing the ECM algorithm for multinomial logit model.
+Version: 0.1.0
+Authors@R:
     person(given = "Soichiro",
            family = "Yamauchi",
            role = c("aut", "cre"),
            email = "syamauchi@g.harvard.edu",
            comment = c(ORCID = "0000-0003-0554-2717"))
-Description: This package implements a ECM algorithm for multinomial logit model.
-License: What license it uses
+Description: This package implements the ECM algorithm for multinomial logit model.
+License: GLP-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
-LinkingTo: 
+LinkingTo:
     Rcpp,
     RcppArmadillo
-Imports: 
+Imports:
     Rcpp,
     RcppArmadillo,
     tibble
 Depends:
     dplyr,
     tidyr
+Suggests:
+    rmarkdown
+ByteCompile: true
+

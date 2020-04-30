@@ -16,10 +16,17 @@ knitr::opts_chunk$set(
 # emlogit
 
 <!-- badges: start -->
-[![Build Status](https://travis-ci.com/soichiroy/emlogit.svg?token=9kDL249kRuSq995JxCG8&branch=master)](https://travis-ci.com/soichiroy/emlogit)
+[![Build Status](https://travis-ci.com/soichiroy/emlogit.svg?branch=master)](https://travis-ci.com/soichiroy/emlogit)
 <!-- badges: end -->
 
 `emlogit` is a **R** package that implements the Expectation and Conditional-Maximization (ECM) algorithm for the multinomial logistic regression.
+
+
+## Table of Contents
+
+| [Installation](#installation) | [Examples](#examples) | [References](#references) |
+|-|-|-|
+
 
 ## Installation
 
@@ -30,9 +37,9 @@ You can install the development version from [GitHub](https://github.com/) with:
 devtools::install_github("soichiroy/emlogit")
 ```
 
-## Example
+## Examples
 
-### Categorical outcome 
+### Categorical outcome
 
 `Car` data from `mlogit` package.
 
@@ -57,16 +64,16 @@ prob <- predict(fit)
 ```
 
 ```{r}
-head(prob) %>% 
+head(prob) %>%
   knitr::kable(digit = 3)
 ```
 
-### Multinomial outcome 
+### Multinomial outcome
 
 `japan` data from `MNP` package.
 
 ```{r}
-## multinomial outcome 
+## multinomial outcome
 data(japan, package = "MNP")
 head(japan)
 
@@ -82,18 +89,47 @@ pred <- predict(fit)
 ```
 
 ```{r}
-head(pred) %>% 
+head(pred) %>%
   knitr::kable(digit = 3)
 ```
 
 
-### Binarya or binomial outcome (logistic regression)
+### Binary outcome
 
-Since the binomial outcome is a specific case of multinomial outcomes, 
+Since the binomial outcome is a special case of multinomial outcomes,
 `emlogit` can handle the binomial outcome.
 
 
 ```{r}
-# load data
+set.seed(1234)
 
+## generate X and pi(X)
+betas <- rnorm(4)
+X     <- MASS::mvrnorm(5000, mu = rep(0, length(betas)), Sigma = diag(length(betas)))
+
+prob  <- 1 / (1 + exp(- 0.5 - X %*% betas))
+
+## generate outcome
+ybin <- rbinom(n = 5000, size = 1, prob = prob)
+Y    <- model.matrix(~ factor(ybin) - 1)
+
+## fit
+fit <- emlogit(Y = Y, X = X)
+
+
+## check
+betas <- c(0.5, betas)
+cbind(true = betas, estimate = summary(fit)$estimate) %>%
+  knitr::kable(digit = 3)
 ```
+
+
+## References
+
+The ECM algorithm used in this package utilizes the Polya-Gamma augmentation scheme originally developed by Polson et al. (2013).
+Applications to the multinomial outcome in the context of deriving the EM algorithm based on Polya-Gamma representation can be found in Durante et al. (2019) and Goplerud (2019), among others.
+
+
++ Durante, D., Canale, A., & Rigon, T. (2019). [A nested expectation–maximization algorithm for latent class models with covariates.](https://doi.org/10.1016/j.spl.2018.10.015) _Statistics & Probability Letters,_ 146, 97-103.
++ Goplerud, M. (2019). [A Multinomial Framework for Ideal Point Estimation.](https://doi.org/10.1017/pan.2018.31) _Political Analysis,_ 27(1), 69-89.
++ Polson, N. G., Scott, J. G., & Windle, J. (2013). [Bayesian inference for logistic models using Pólya–Gamma latent variables.](https://doi.org/10.1080/01621459.2013.829001) _Journal of the American Statistical Association,_ 108(504), 1339-1349.

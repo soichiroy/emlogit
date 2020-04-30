@@ -20,8 +20,10 @@
 #'   \item \code{verbose} A boolean argument. If set \code{TRUE}, the function shows the log-posterior for each iteration. Default is \code{FALSE}.
 #'   \item \code{intercept} A boolean argument. When \code{X} already contains the intercept term (i.e., a column of ones), this option should \code{FALSE}.
 #'      Default is \code{TRUE}.
-#'   \item \code{variance} A boolean argument. If \code{FALSE}, \code{emlogit()} skips the variance calculation. 
+#'   \item \code{variance} A boolean argument. If \code{FALSE}, \code{emlogit()} skips the variance calculation.
 #'      This is useful when calling \code{emlogit()} from other programs. Default is \code{TRUE}.
+#'   \item \code{initialize} A method for initialization.
+#'       The package currently supports \code{initialize = "random"} (random) or \code{initialize = "ls"} (least square). Default is \code{"ls"}.
 #' }
 #' @export
 emlogit <- function(Y, X, control = list()) {
@@ -34,7 +36,7 @@ emlogit <- function(Y, X, control = list()) {
   }
 
   control <- specify_prior(control, ncol(X))
-  B <- coef_initialize(Y, X)
+  B <- coef_initialize(Y, X, control)
 
   ## estimate coefficeints using EM -----------------------------------
   coef <- emlogit_run(
@@ -52,7 +54,7 @@ emlogit <- function(Y, X, control = list()) {
 
   ## obtain the in-sample fit -----------------------------------------
   prob <- predict_prob(X, coef)
-  fit <- list(coef = coef, var = var, prob = prob, control = control, 
+  fit <- list(coef = coef, var = var, prob = prob, control = control,
               x_name = colnames(X), y_name = colnames(Y))
 
   class(fit) <- c("emlogit", "emlogit.est")
@@ -83,9 +85,17 @@ input_check <- function(control) {
   if (!exists("robust", control)) {
     control$robust <- FALSE
   }
-  
+
   if (!exists("variance", control)) {
     control$variance <- TRUE
+  }
+
+  if (!exists("initialize", control)) {
+    control$initialize <- "ls"
+  } else {
+    if (!(control$initialize %in% c("ls", "random"))) {
+      stop("Not a supported initialization method")
+    }
   }
   return(control)
 }
@@ -103,13 +113,19 @@ specify_prior <- function(control, n_cov) {
   return(control)
 }
 
-#' Initialize coefficeints
+#' Initialize coefficeints randomly from \code{rnorm()}.
 #' @keywords internal
-coef_initialize <- function(Y, X) {
+coef_initialize <- function(Y, X, control) {
   n_cov <- ncol(X)
   J     <- ncol(Y)
-  B     <- cbind(rep(0, n_cov),
-                 matrix(rnorm(n_cov * (J-1)), nrow = n_cov, ncol = J-1))
-  B <- as.matrix(B)
+
+  if (control$initialize == "random") {
+    B     <- cbind(rep(0, n_cov),
+                   matrix(rnorm(n_cov * (J-1)), nrow = n_cov, ncol = J-1))
+    B <- as.matrix(B)
+  } else if (control$initialize == "ls") {
+    B <- solve(t(X) %*% X, t(X) %*% Y)
+  }
+
   return(B)
 }

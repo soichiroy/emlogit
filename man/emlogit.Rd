@@ -26,6 +26,10 @@ The number of rows should match with the number of rows for \code{Y}.}
   \item \code{verbose} A boolean argument. If set \code{TRUE}, the function shows the log-posterior for each iteration. Default is \code{FALSE}.
   \item \code{intercept} A boolean argument. When \code{X} already contains the intercept term (i.e., a column of ones), this option should \code{FALSE}.
      Default is \code{TRUE}.
+  \item \code{variance} A boolean argument. If \code{FALSE}, \code{emlogit()} skips the variance calculation.
+     This is useful when calling \code{emlogit()} from other programs. Default is \code{TRUE}.
+  \item \code{initialize} A method for initialization.
+      The package currently supports \code{initialize = "random"} (random) or \code{initialize = "ls"} (least square). Default is \code{"ls"}.
 }}
 }
 \description{

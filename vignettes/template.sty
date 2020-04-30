@@ -1,0 +1,207 @@
+\documentclass[11pt, letterpaper]{article}
+\usepackage[top=1.2in, bottom=1.2in, left=1.2in, right=1.2in]{geometry}
+
+%% === math ====
+\usepackage{amsmath, amssymb}
+\usepackage{amsthm}
+\usepackage{bm}
+
+% Essential packages
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{url}
+\usepackage{float}
+
+
+% Colors ------------
+\usepackage{xcolor}
+\definecolor{mygray}{gray}{0.5} % define color on gray scale
+\definecolor{lgray}{gray}{0.9} % define color on gray scale
+\definecolor{crimson}{RGB}{204,0,0}
+\definecolor{dgray}{RGB}{125,125,125}
+\newcommand{\crimson}[1]{\textcolor{crimson}{#1}}
+  \newcommand{\dgray}[1]{\textcolor{dgray}{#1}}
+    \newcommand{\lgray}[1]{\textcolor{lgray}{#1}}
+      \newcommand{\mygray}[1]{\textcolor{mygray}{#1}}
+
+% % Hyperref
+% \usepackage[pdfencoding = auto, 
+%             hidelinks = true, 
+%             urlcolor = MidnightBlue, 
+%             linkcolor = MidnighBlue]{hyperref}
+% 
+
+
+%% === hyperlink ===
+\usepackage{xcolor}
+\definecolor{linkcolor}{HTML}{0645AD}
+\usepackage{hyperref}
+\hypersetup{
+     colorlinks   = true,
+     allcolors    = linkcolor,%porange,
+     %allcolors=[rgb]{0,0.53,0.70}%{.15,.53,.52}%{0.58,0.27, 0.31}
+}
+
+
+\definecolor{white}{RGB}{255,255,255}
+\definecolor{crimson}{RGB}{220,20,60}
+\definecolor{blue}{RGB}{0,0,205}
+\definecolor{myblue}{RGB}{80,80,160}
+\definecolor{mygreen}{RGB}{80,160,80}
+\colorlet{tcrimson}{white!40!crimson}
+\colorlet{tblue}{white!40!blue}
+\definecolor{porange}{HTML}{EE7F2D}
+
+
+%% === math operators ===
+\def\*#1{\mathbf{#1}}
+
+\newcommand{\argmax}{\mathop{\rm arg~max}\limits}
+\newcommand{\argmin}{\mathop{\rm arg~min}\limits}
+\newcommand{\ts}{t^{\star}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\inner}[1]{\left\langle#1\right\rangle}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\X}{\mathbb{X}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\hS}{\mathbb{S}}
+\newcommand{\hP}{\mathbb{P}}
+\newcommand{\bI}{\mathbf{I}}
+\newcommand{\cF}{\mathcal{F}}
+\newcommand{\cT}{\mathcal{T}}
+\newcommand{\cX}{\mathcal{X}}
+\newcommand{\cY}{\mathcal{Y}}
+\newcommand{\cO}{\mathcal{O}}
+\newcommand{\cM}{\mathcal{M}}
+\newcommand{\cU}{\mathcal{U}}
+\newcommand{\cZ}{\mathcal{Z}}
+\newcommand{\cB}{\mathcal{B}}
+
+\newcommand{\indep}{\!\perp\!\!\!\perp}
+
+
+%% ==== for JSS ====
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\proglang}[1]{\textsf{#1}}
+\newcommand{\pkg}[1]{{\fontseries{b}\selectfont #1}}
+
+
+%% === bib ===
+\usepackage{natbib}
+%\bibliographystyle{abbrvnat}
+\bibliographystyle{apa}
+
+
+
+% Parameters
+\usepackage{soul} % underline
+\usepackage{tcolorbox}
+
+% Minion for main text and math
+% \usepackage{MinionPro}
+
+% Helvetica for sans serif
+% (scaled to match size of Minion)
+% \usepackage[scaled=0.95]{helvet}
+
+% Bera Mono for monospaced
+% (scaled to match size of Minion)
+% \usepackage[T1]{fontenc}
+% \usepackage[scaled=0.9]{beramono}
+% \usepackage{fontspec}
+% \setmonofont[Scale=0.85]{Monaco}
+
+% FORCE HELVET
+% \renewcommand\familydefault{\sfdefault}
+
+% Spacing
+\usepackage{setspace}
+
+
+% Sectioing
+% \setcounter{secnumdepth}{0} % fix starting with "0.1"
+
+
+
+
+% Figures
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+
+
+% Shading and Rmd macros
+$if(listings)$
+\usepackage{listings}
+$endif$
+$if(lhs)$
+\lstnewenvironment{code}{\lstset{language=r,basicstyle=\small\ttfamily}}{}
+$endif$
+$if(highlighting-macros)$
+$highlighting-macros$
+$endif$
+$if(verbatim-in-note)$
+\usepackage{fancyvrb}
+$endif$
+$if(tables)$
+\usepackage{longtable,booktabs}
+$endif$
+
+
+% Parmaters
+
+$if(title)$
+\title{ \LARGE\textbf{$title$}}
+$endif$ 
+
+
+\author{
+$for(author)$
+\textbf{$author.name$}$if(author.thanks)$\thanks{$author.thanks$}$endif$\\
+                      $if(author.institution)${\normalsize $author.institution$}$endif$
+                      $if(author.and)$ \and $endif$$sep$
+$endfor$
+}
+
+$if(date)$
+\date{$date$}
+$endif$
+
+\begin{document}
+
+$if(title)$
+\maketitle
+$endif$
+
+$if(toc)$
+{
+\hypersetup{linkcolor=black}
+\setcounter{tocdepth}{$toc-depth$}
+\tableofcontents
+}
+$endif$
+
+$if(abstract)$
+
+\begin{abstract}
+
+\noindent $abstract$
+
+\end{abstract}
+
+$endif$
+
+
+
+$body$
+\end{document}
