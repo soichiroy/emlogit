@@ -24,3 +24,5 @@ Depends:
     tidyr
 Suggests:
     rmarkdown
+ByteCompile: true
+
