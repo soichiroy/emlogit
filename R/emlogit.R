@@ -126,6 +126,7 @@ specify_prior <- function(control, n_cov) {
 }
 
 #' Initialize coefficeints randomly from \code{rnorm()}.
+#' @importFrom stats rnorm
 #' @keywords internal
 coef_initialize <- function(Y, X, control) {
   n_cov <- ncol(X)

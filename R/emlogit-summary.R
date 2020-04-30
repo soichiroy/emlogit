@@ -1,10 +1,14 @@
 
 #' Print function
+#' @param obj An output of \code{summary.emlogit()} function.
 #' @import tibble
+#' @importFrom utils getFromNamespace
 #' @export
 print.summary.emlogit <- function(obj) {
   # print(obj)
-  tibble:::print.tbl(obj)
+  print_tbl <- getFromNamespace("print.tbl", "tibble")
+  # tibble:::print.tbl(obj)
+  print_tbl(obj)
   invisible(obj)
 }
 
@@ -13,7 +17,7 @@ print.summary.emlogit <- function(obj) {
 #' @param obj An object class of \code{"emlogit.est"}
 #' @importFrom dplyr %>% mutate select arrange left_join
 #' @importFrom tibble as_tibble
-#' @importFrom tidyr pivot_longer
+#' @importFrom tidyr pivot_longer everything
 #' @export
 summary.emlogit <- function(obj) {
   if ("emlogit.est" %in% class(obj)) {
@@ -63,6 +67,8 @@ summary.emlogit <- function(obj) {
 
 
 #' Obtain the predicted probability
+#' @param obj An output of \code{emlogit()} funcion. 
+#' @param newdata A matrix of newdata. If not provided, the insample fit is returned.
 #' @export
 predict.emlogit <- function(obj, newdata = NULL) {
 

@@ -6,6 +6,11 @@
 \usage{
 \method{predict}{emlogit}(obj, newdata = NULL)
 }
+\arguments{
+\item{obj}{An output of \code{emlogit()} funcion.}
+
+\item{newdata}{A matrix of newdata. If not provided, the insample fit is returned.}
+}
 \description{
 Obtain the predicted probability
 }
