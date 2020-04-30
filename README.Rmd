@@ -70,6 +70,7 @@ head(prob) %>%
 data(japan, package = "MNP")
 head(japan)
 
+# prepare datainput
 Y <- japan %>% select(LDP, NFP, SKG, JCP) %>% data.matrix()
 X <- japan %>% select(gender, education, age) %>% data.matrix()
 
@@ -86,7 +87,13 @@ head(pred) %>%
 ```
 
 
-### Binary outcome (logistic regression)
+### Binarya or binomial outcome (logistic regression)
 
 Since the binomial outcome is a specific case of multinomial outcomes, 
 `emlogit` can handle the binomial outcome.
+
+
+```{r}
+# load data
+
+```
