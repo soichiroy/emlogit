@@ -219,13 +219,13 @@ arma::mat emlogit_run(
 
 
   double eval     = 1.0;
-  int    iter     = 0;
+  int convergence = 0;
   arma::mat omega = arma::zeros(Y.n_rows, Y.n_cols-1);
   double ll_old   = log_likelihood(Y, X, B, mu0, Z0);
   arma::vec  ni   = arma::sum(Y, 1);
 
   // EM updates
-  while((iter < max_iter) & (eval > tol)) {
+  for (int iter = 0; iter < max_iter; iter++) {
     // E-step -------------------------------------- //
     emlogit_estep(X, B, ni, omega);
 
@@ -236,15 +236,29 @@ arma::mat emlogit_run(
     if (verbose) {
       Rcpp::Rcout << "ll = " << ll_old << std::endl;
     }
-
     double ll_new = log_likelihood(Y, X, B, mu0, Z0);
     eval = abs(ll_new - ll_old) / abs(ll_old);
     ll_old = ll_new;
 
-    // update iterator ----------------------------- //
-    ++iter;
-  }
+    // convergence check ----------------------------//
+    if (eval < tol) {
+      convergence = 1;
+      break;
+    }
+    
+    // check user interruption -------------------- //
+    if (iter % 50 == 0) {
+      Rcpp::checkUserInterrupt();    
+    }
 
+
+  } // end of EM iteration 
+
+  // convergece message --------------------------- //
+  if (verbose && convergence == 0) {
+    Rcpp::Rcout << "EM algorithm did not converge." << std::endl;
+  }
+    
   return B;
 }
 
