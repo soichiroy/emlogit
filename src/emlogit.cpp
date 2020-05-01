@@ -227,9 +227,11 @@ arma::mat emlogit_run(
   // EM updates
   for (int iter = 0; iter < max_iter; iter++) {
     // E-step -------------------------------------- //
+    // - update omega | X, B 
     emlogit_estep(X, B, ni, omega);
 
     // M-step -------------------------------------- //
+    // - update B | Y, X, omega, prior 
     emlogit_mstep(Y, X, B, ni, omega, mu0, Z0);
 
     // evaluate log-likelihood --------------------- //
