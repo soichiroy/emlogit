@@ -75,6 +75,7 @@ emlogit <- function(Y, X, control = list()) {
 
 #' Input check
 #' A function to set the default values of \code{control}.
+#' @param control A list of control parameters.
 #' @keywords internal
 input_check <- function(control) {
   if (!exists("max_iter", control)) {
