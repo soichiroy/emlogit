@@ -1,3 +1,5 @@
 ^README\.Rmd$
 ^\.travis\.yml$
 ^vignettes/emlogit_derivation\.Rmd$
+^.*\.Rproj$
+^\.Rproj\.user$

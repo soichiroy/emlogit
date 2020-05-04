@@ -7,6 +7,9 @@ A function to set the default values of \code{control}.}
 \usage{
 input_check(control)
 }
+\arguments{
+\item{control}{A list of control parameters.}
+}
 \description{
 Input check
 A function to set the default values of \code{control}.
