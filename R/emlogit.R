@@ -42,21 +42,22 @@ emlogit <- function(Y, X, control = list()) {
 
   if (exists("initial_value", control)) {
     ## check input
-    if (!all(dim(control$initial_value) == c(ncol(X), ncol(Y)-1))) stop("Dimension of initial value does not match.")
+    if (!all(dim(control$initial_value) == c(ncol(X), ncol(Y) - 1)))
+      stop("Dimension of initial value does not match.")
     B <- control$initial_value
   } else {
     B <- coef_initialize(Y, X, control)
   }
 
 
-  ## estimate coefficeints using EM -----------------------------------
+  ## estimate coefficients using EM -----------------------------------
   coef <- emlogit_run(
       Y = Y, X = X, B = B,
       tol = control$tol, max_iter = control$max_iter,
       mu0 = control$mu0, Z0 = control$Z0, verbose = control$verbose
     )
 
-  ## compute variance of coefficeints ---------------------------------
+  ## compute variance of coefficients ---------------------------------
   if (isTRUE(control$variance)) {
     var <- emlogit_var(Y, X, coef, control$mu0, control$Z0, control$robust)
   } else {
@@ -126,7 +127,7 @@ specify_prior <- function(control, n_cov) {
   return(control)
 }
 
-#' Initialize coefficeints randomly from \code{rnorm()}.
+#' Initialize coefficients randomly from \code{rnorm()}.
 #' @importFrom stats rnorm
 #' @keywords internal
 coef_initialize <- function(Y, X, control) {
