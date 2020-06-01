@@ -33,7 +33,17 @@ al_estep <- function(X, betas) {
 
 #' M-step function to solve quadratic programming.
 #' @keywords internal
-al_mstep <- function() {
+al_mstep <- function(y, X, omega) {
+
+
+  ## prepare inputs
+  Dmat <- t(X) %*% diag(omega) %*% X
+  dvec <- t(X) %*% ((Dmat - 1/2) / omega)
+  Amat
+
+  ## solve QP
+  ## can we pass the initial base?
+  fit <- quadprog::solve.QP(Dmat, dvec, Amat)
 
 }
 

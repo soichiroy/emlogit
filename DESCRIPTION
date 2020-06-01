@@ -18,7 +18,8 @@ LinkingTo:
 Imports:
     Rcpp,
     RcppArmadillo,
-    tibble
+    tibble,
+    purrr
 Depends:
     dplyr,
     tidyr
