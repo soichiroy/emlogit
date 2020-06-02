@@ -19,7 +19,8 @@ Imports:
     Rcpp,
     RcppArmadillo,
     tibble,
-    purrr
+    purrr,
+    quadprog
 Depends:
     dplyr,
     tidyr
