@@ -120,8 +120,6 @@ al_em_run <- function(y, X, option) {
 
 
 
-
-
 al_set_option <- function(option) {
   ## set maximum number of iterations
   if (isFALSE(exists("max_iter", option))) option$max_iter <- 200

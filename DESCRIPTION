@@ -20,7 +20,8 @@ Imports:
     RcppArmadillo,
     tibble,
     purrr,
-    quadprog
+    quadprog,
+    osqp
 Depends:
     dplyr,
     tidyr
