@@ -35,54 +35,6 @@ anova_logit <- function(y, X, trials = NULL, option = list()) {
 }
 
 
-#' E-step function to compute the expectation of omega.
-#' @keywords internal
-al_estep <- function(X, betas) {
-  Xb    <- X %*% betas
-  omega <- as.vector(tanh(Xb / 2) / (2 * Xb))
-  return(omega)
-}
-
-#' M-step function to solve quadratic programming.
-#' @keywords internal
-al_mstep <- function(y, X, trials, omega, p_vec) {
-  ## prepare inputs
-  XO   <- t(X) %*% diag(omega)
-  Dmat <- XO %*% X
-  dvec <- as.vector(XO %*% ((y - trials/2) / omega))     ## change this to accomodate binomial cases n[i] > 1
-  Amat <- create_Amat(pvec = p_vec); Amat[1,1] <- 0 ## no const on the intercept
-  bvec <- rep(0, length(p_vec))
-
-  ## solve QP
-  ## can we pass the initial base?
-  settings <- osqp::osqpSettings(verbose = FALSE, eps_abs = 1e-5, eps_rel = 1e-5)
-  fit      <- osqp::solve_osqp(Dmat, -dvec, Amat, l = bvec, u = bvec, pars = settings)
-
-  return(fit$x)
-}
-
-
-#' Create A matrix for linear constraints
-#' @keywords internal
-create_Amat <- function(pvec) {
-
-  n_rows <- length(pvec)
-  n_cols <- sum(pvec)
-  Amat   <- matrix(0, nrow = n_rows, ncol = n_cols)
-
-  lb <- 1; ub <- pvec[1]
-  for (i in seq_len(n_rows)) {
-    Amat[i,lb:ub] <- 1
-    ## update lower bound
-    lb <- lb + pvec[i]
-    ## update upper bound
-    if (i < n_rows) ub <- ub + pvec[i+1]
-  }
-
-  return(Amat)
-
-}
-
 #' EM-algorithm for the ANOVA logit
 #' @keywords internal
 al_em_run <- function(y, X, trials, option) {
@@ -119,6 +71,39 @@ al_em_run <- function(y, X, trials, option) {
   par$convergence <- if_else(iter < option$max_iter, 1, 0)
   return(par)
 }
+
+
+##
+## EM functions 
+##
+
+#' E-step function to compute the expectation of omega.
+#' @keywords internal
+al_estep <- function(X, betas) {
+  Xb    <- X %*% betas
+  omega <- as.vector(tanh(Xb / 2) / (2 * Xb))
+  return(omega)
+}
+
+#' M-step function to solve quadratic programming.
+#' @keywords internal
+al_mstep <- function(y, X, trials, omega, p_vec) {
+  ## prepare inputs
+  XO   <- t(X) %*% diag(omega)
+  Dmat <- XO %*% X
+  dvec <- as.vector(XO %*% ((y - trials/2) / omega))     ## change this to accomodate binomial cases n[i] > 1
+  Amat <- create_Amat(pvec = p_vec); Amat[1,1] <- 0 ## no const on the intercept
+  bvec <- rep(0, length(p_vec))
+
+  ## solve QP
+  ## can we pass the initial base?
+  settings <- osqp::osqpSettings(verbose = FALSE, eps_abs = 1e-5, eps_rel = 1e-5)
+  fit      <- osqp::solve_osqp(Dmat, -dvec, Amat, l = bvec, u = bvec, pars = settings)
+
+  return(fit$x)
+}
+
+
 
 
 
