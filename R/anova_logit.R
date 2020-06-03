@@ -10,18 +10,18 @@
 #' @param X a matrix of overparametrized
 anova_logit <- function(y, X, option = list()) {
 
+  ## -------------------------------------------
   ## set the default value of the option parameters
   option <- al_set_option(option)
 
-  ## EM
+  ## EM ----------------------------------------
   params <- al_em_run(y, X, option)
 
-
-  ## fitted value
+  ## fitted value ------------------------------
   betas  <- params[[1]][['beta']]
   fitted <- 1 / (1 + exp(-as.vector(X %*% betas)))
 
-  ## return estimates
+  ## return estimates --------------------------
   option$iteration   <- params$iteration
   option$convergence <- params$convergence
   attr(betas, "option") <- option
@@ -34,7 +34,7 @@ anova_logit <- function(y, X, option = list()) {
 #' E-step function to compute the expectation of omega.
 #' @keywords internal
 al_estep <- function(X, betas) {
-  Xb <- X %*% betas
+  Xb    <- X %*% betas
   omega <- as.vector(tanh(Xb / 2) / (2 * Xb))
   return(omega)
 }
@@ -42,24 +42,20 @@ al_estep <- function(X, betas) {
 #' M-step function to solve quadratic programming.
 #' @keywords internal
 al_mstep <- function(y, X, omega, p_vec) {
-
-
   ## prepare inputs
-  Dmat <- t(X) %*% diag(omega) %*% X
-  # Dmat <- Matrix::nearPD(t(X) %*% diag(omega) %*% X)$mat
-  dvec <- as.vector(t(X) %*% diag(omega) %*% ((y - 1/2) / omega))  ## change this to accomodate binomial cases n[i] > 1
-  Amat <- create_Amat(pvec = p_vec); Amat[1,1] <- 0
+  XO   <- t(X) %*% diag(omega)
+  Dmat <- XO %*% X
+  dvec <- as.vector(XO %*% ((y - 1/2) / omega))     ## change this to accomodate binomial cases n[i] > 1
+  Amat <- create_Amat(pvec = p_vec); Amat[1,1] <- 0 ## no const on the intercept
   bvec <- rep(0, length(p_vec))
 
   ## solve QP
   ## can we pass the initial base?
-  # fit <- quadprog::solve.QP(Dmat, dvec, Amat)
   settings <- osqp::osqpSettings(verbose = FALSE, eps_abs = 1e-8, eps_rel = 1e-8)
-  osqp_solution <- osqp::solve_osqp(
+  fit      <- osqp::solve_osqp(
       Dmat, -dvec, Amat, l = bvec, u = bvec, pars = settings)
 
-  return(osqp_solution$x)
-
+  return(fit$x)
 }
 
 
