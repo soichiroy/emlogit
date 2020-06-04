@@ -128,17 +128,123 @@ al_set_option <- function(option) {
 }
 
 
+al_expand_X <- function(X, p_vec) {
+  ##
+  ## Expand the original design matrix X[j] with dimension p[j] to
+  ## Xe[j] with dimension p[j] + 2 * d[j] where d[j] = p[j] * (p[j] - 1) / 2
+  ##  by augmenting Xe[j] = [X[j], 0] where 0 has dimension n by d[j]
+  ##
+
+  Xe  <- vector("list", length(p_vec))
+  nobs <- nrow(X)
+  ## intercept is not expanded
+  Xe[[1]] <- X[,1]
+
+  ## expand other variables
+  for (j in 2:length(p_vec)) {
+    Xe[[j]] <- cbind(X[,], )
+  }
+}
+
 #' Define constrains
 #' @param pvec A vector of length K where each element corresponds to the level of k-th variable.
 #' @param regularize A boolena argument.
-al_set_opt_input <- function(p_vec, regularize) {
+al_set_opt_input <- function(p_vec, regularize, lambda = 1) {
   if (isTRUE(regularize)) {
+    ##
+    ## Regularized problem
+    ##    min (1/2) * b'Db - b'd
+    ##    st   lb <= A'b <= ub
+    ## Example
+    ## - pvec = c(1, 2, 3)
+    ## - A has the following structure
+    ##      | 0 , 0  , 0  | /* no constraints on the intercept
+    ##      | 0 , L2 , 0  | /* define pairwise difference
+    ##  A = | 0 , 0  , L3 | /* define pairwise difference
+    ##      | 0 , W2 , W3 | /* weighted sum of theta+ and theta -
+    ##      | 0 , M2 , 0  | /* positivity constarints
+    ##      | 0 , 0  , M3 | /* positivity constrains
+    ## where
+    ##  Lj =
+    ## and
+    ##  Mj = |0, I, 0|
+    ##       |0, 0, I|
+
+    ## create Amat
+    Lj <- Sj <- Pj <- vector("list", length(p_vec))
+    Lj[[1]] <- Sj[[1]] <- Pj[[1]] <- Matrix::Matrix(0, nrow = 1, ncol = 1)
+
+    for (j in 2:length(p_vec)) {
+      ## creat Dj
+      dj <- p_vec[j] * (p_vec[j] - 1) / 2
+      Dj <- Mj <- Matrix::Matrix(0, nrow = dj, ncol = p_vec[j])
+      iter <- 1
+      for (p1 in 1:(p_vec[j]-1)) {
+        for (p2 in (p1+1):p_vec[j]) {
+          Dj[iter, p1] <- 1
+          Dj[iter, p2] <- -1
+          iter <- iter + 1
+        }
+      }
+
+      one_zero_j <- Matrix::Matrix(c(rep(1, p_vec[j]), rep(0, 2 * dj)), nrow = 1)
+      Ij <- Matrix::Diagonal(dj)
+
+      Lj[[j]] <- rbind(
+        cbind(Dj, Ij, -Ij),
+        one_zero_j
+      )
+
+      ## create theta+ + theta- <= t constraints
+      weigths <- 1
+      zero_ones <- Matrix::Matrix(c(rep(0, p_vec[j]),
+                                    rep(weigths, 2 * dj)), nrow = 1)
+      Sj[[j]] <- zero_ones
+
+      ## positivity constraints
+      zeros <- Matrix::Matrix(0, nrow = dj, ncol = dj)
+      Pj[[j]] <- rbind(cbind(Mj, Ij, zeros), cbind(Mj, zeros, Ij))
+
+    }
+
+    ## create a block diagonal of Lj's
+    Lj_block <- Matrix::bdiag(Lj)
+    Sj_block <- do.call(cbind, Sj)
+    Pj_block <- Matrix::bdiag(Pj)[-1,]
+    Amat     <- rbind(Lj_block, Sj_block, Pj_block)
+
+
+    ##
+    ## Define: lb <= Ax <= ub
+    ##
+    lb <- ub <- rep(0, nrow(Lj_block))    #* Lj * b = 0
+    lb <- c(lb, 0)                        #* lb for Sj = 0
+    ub <- c(ub, lambda)                   #* ub for Sj = lambda
+    lb <- c(lb, rep(0, nrow(Pj_block)))   #* positivity constrains on theta+-
+    ub <- c(ub, rep(Inf, nrow(Pj_block))) #* no upper bound
 
   } else {
+    ##
+    ## No-regularization
+    ##
+    ## Example:
+    ##  - p_vec = c(1, 2, 3)
+    ##  - first element is always 1 corresponding to the intercept
+    ##  - A has the following structure:
+    ##      1, 0, 0, 0, 0, 0
+    ##      0, 1, 1, 0, 0, 0
+    ##      0, 0, 0, 1, 1, 1
+    ##
+    ## - Then, we set A[1,1] = 0
+    ##   because intercept does not have a constraint.
+    ##
+
     ## impose sum to zero constraints
-    Amat <- create_Amat(pvec = p_vec);
+    Amat <- create_Amat_unreg(pvec = p_vec);
+
     ## intercept is constraint free
     Amat[1,1] <- 0
+
     # linear equality constraint (sum to zero)
     lb <- ub <- rep(0, length(p_vec))
   }
@@ -153,7 +259,10 @@ al_set_opt_input <- function(p_vec, regularize) {
 #' Check convergence by computing the maximum rate of change
 #' @keywords internal
 al_check_convergence <- function(params) {
-  max_diff <- max(abs(unlist(params[[1]]) - unlist(params[[2]]))) / abs(unlist(params[[1]]))
+  ## compute max( |beta[t] - beta[t-1]| / |beta[t-1]| )
+  max_diff <- max( abs(unlist(params[[1]]) - unlist(params[[2]])) /
+                      abs(unlist(params[[1]])) )
+
   return(max_diff)
 }
 

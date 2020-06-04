@@ -4,7 +4,7 @@
 \alias{al_set_opt_input}
 \title{Define constrains}
 \usage{
-al_set_opt_input(p_vec, regularize)
+al_set_opt_input(p_vec, regularize, lambda = 1)
 }
 \arguments{
 \item{regularize}{A boolena argument.}
