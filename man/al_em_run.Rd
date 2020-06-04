@@ -4,7 +4,7 @@
 \alias{al_em_run}
 \title{EM-algorithm for the ANOVA logit}
 \usage{
-al_em_run(y, X, option)
+al_em_run(y, X, trials, option)
 }
 \description{
 EM-algorithm for the ANOVA logit

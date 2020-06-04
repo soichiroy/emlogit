@@ -26,11 +26,11 @@ anova_logit <- function(y, X, trials = NULL, option = list()) {
   fitted <- 1 / (1 + exp(-as.vector(X %*% betas)))
 
   ## return estimates --------------------------
-  option$iteration   <- params$iteration
-  option$convergence <- params$convergence
+  option$iteration      <- params$iteration
+  option$convergence    <- params$convergence
   attr(betas, "option") <- option
   attr(betas, "fitted") <- fitted
-  class(betas) <- c("anova_logit")
+  class(betas)          <- c("anova_logit")
   return(betas)
 }
 
@@ -54,20 +54,21 @@ al_em_run <- function(y, X, trials, option) {
     params[[iter]]$omega <- al_estep(X, params[[iter]]$beta)
 
     ## M-step ---------------------------------------------
-    params[[iter+1]]$beta  <- al_mstep(y, X, trials, params[[iter]]$omega, option$pvec)
+    params[[iter+1]]$beta <- al_mstep(y, X, trials, params[[iter]]$omega, option$pvec)
 
     ## check_convergence
     if (iter > 1 &&
-        al_check_convergence(params[c(iter - 1, iter)]) < option$tol) {
+        al_check_convergence(params[c(iter - 1, iter)]) < option$tol
+      ) {
         break;
     }
   }
 
 
-  ## remve NULL elements
+  ## remve NULL elements and returns the final estimate
   par <- params[purrr::map_lgl(params, ~!is.null(.x))]
   par <- par[length(par)]
-  par$iteration <- iter
+  par$iteration   <- iter
   par$convergence <- if_else(iter < option$max_iter, 1, 0)
   return(par)
 }
@@ -91,7 +92,7 @@ al_mstep <- function(y, X, trials, omega, p_vec) {
   ## prepare inputs
   XO   <- t(X) %*% diag(omega)
   Dmat <- XO %*% X
-  dvec <- as.vector(XO %*% ((y - trials/2) / omega))     ## change this to accomodate binomial cases n[i] > 1
+  dvec <- as.vector(XO %*% ((y - trials / 2) / omega))
   Amat <- create_Amat(pvec = p_vec); Amat[1,1] <- 0 ## no const on the intercept
   bvec <- rep(0, length(p_vec))
 
@@ -104,9 +105,12 @@ al_mstep <- function(y, X, trials, omega, p_vec) {
 }
 
 
+##
+## Handling inputs  
+##
 
-
-
+#' Set default opiions 
+#' @keywords internal
 al_set_option <- function(option) {
   ## set maximum number of iterations
   if (isFALSE(exists("max_iter", option))) option$max_iter <- 200
@@ -114,20 +118,22 @@ al_set_option <- function(option) {
   ## set tolerance parameter for the convergence
   if (isFALSE(exists('tol', option))) option$tol <- 1e-5
 
-  ##
+  ## set regularization options 
+  if (isFALSE(exists('regularize', option))) option$regularize <- TRUE
 
   return(option)
 }
 
 
-
+#' Check convergence by computing the maximum rate of change 
+#' @keywords internal
 al_check_convergence <- function(params) {
   max_diff <- max(abs(unlist(params[[1]]) - unlist(params[[2]]))) / abs(unlist(params[[1]]))
   return(max_diff)
-
 }
 
-
+#' Initialize coefficients
+#' @keywords internal
 al_params_initialize <- function(X, params) {
   params[[1]]$beta <- rnorm(ncol(X), 0, 0.5)
   return(params)
