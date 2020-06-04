@@ -2,7 +2,7 @@
 % Please edit documentation in R/anova_logit.R
 \name{al_set_opt_input}
 \alias{al_set_opt_input}
-\title{Define constrains}
+\title{Define inputs for constrains}
 \usage{
 al_set_opt_input(p_vec, regularize, lambda = 1)
 }
@@ -12,5 +12,5 @@ al_set_opt_input(p_vec, regularize, lambda = 1)
 \item{pvec}{A vector of length K where each element corresponds to the level of k-th variable.}
 }
 \description{
-Define constrains
+Define inputs for constrains
 }

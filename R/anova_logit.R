@@ -41,7 +41,13 @@ al_em_run <- function(y, X, trials, option) {
   params <- al_params_initialize(X, params)
 
   ## define constrains
-  opt_input <- al_set_opt_input(option$pvec, option$regularize)
+  opt_input <- al_set_opt_input(option$pvec, option$regularize, option$lambda)
+
+  if (isTRUE(option$regularize)) {
+    Xe <- al_expand_X(X, option$pvec)
+  } else {
+    Xe <- X
+  }
 
   # set trials
   if (is.null(trials)) trials <- rep(1, length(y))
@@ -54,20 +60,24 @@ al_em_run <- function(y, X, trials, option) {
     params[[iter]]$omega <- al_estep(X, params[[iter]]$beta)
 
     ## M-step ---------------------------------------------
-    params[[iter+1]]$beta <- al_mstep(y, X, trials, params[[iter]]$omega, opt_input)
+    params[[iter+1]]$beta <- al_mstep(y, Xe, trials, params[[iter]]$omega, opt_input)
 
-    ## check_convergence
+    ## discard slack variables ----------------------------
+    if (isTRUE(option$regularize)) {
+      params[[iter+1]]$beta <- al_subset_beta(params[[iter+1]]$beta, option$pvec)
+    }
+
+    ## check_convergence ----------------------------------
     if (iter > 1 &&
         al_check_convergence(params[c(iter - 1, iter)]) < option$tol
       ) {
         break;
     }
-  }
-
+  } ## end of estimation iterations
 
   ## remve NULL elements and returns the final estimate
   params <- params[purrr::map_lgl(params, ~!is.null(.x))]
-  par  <- vector("list")
+  par    <- vector("list")
   par$coefficient <- params[[length(params)]][['beta']]
   par$iteration   <- iter
   par$convergence <- if_else(iter < option$max_iter, 1, 0)
@@ -88,6 +98,7 @@ al_estep <- function(X, betas) {
 }
 
 #' M-step function to solve quadratic programming.
+#' @import Matrix
 #' @keywords internal
 al_mstep <- function(y, X, trials, omega, opt_input) {
   ## prepare inputs
@@ -124,10 +135,30 @@ al_set_option <- function(option) {
   ## set regularization options
   if (isFALSE(exists('regularize', option))) option$regularize <- FALSE
 
+  ## set the default regularization parameter
+  if (isFALSE(exists('lambda', option))) option$lambda <- 1
+  
   return(option)
 }
 
+#' Subset beta
+#' @keywords internal
+al_subset_beta <- function(beta_full, p_vec) {
 
+  beta_sub <- vector("list", length = length(p_vec))
+  beta_sub[[1]] <- beta_full[1]
+  lb <- 2; ub <- 0
+  for (j in 2:length(p_vec)) {
+    dj <- p_vec[j] * (p_vec[j] - 1) / 2
+    ub <- ub + (p_vec[j] + 2 * dj)
+    beta_sub[[j]] <- beta_full[lb:(lb + p_vec[j]-1)]
+    lb <- lb + ub
+  }
+  return(unlist(beta_sub))
+}
+
+#' Expand design matrix
+#' @keywords internal
 al_expand_X <- function(X, p_vec) {
   ##
   ## Expand the original design matrix X[j] with dimension p[j] to
@@ -141,12 +172,20 @@ al_expand_X <- function(X, p_vec) {
   Xe[[1]] <- X[,1]
 
   ## expand other variables
+  lb <- 2; ub <- 1 + p_vec[2]
   for (j in 2:length(p_vec)) {
-    Xe[[j]] <- cbind(X[,], )
+    dj <- p_vec[j] * (p_vec[j] - 1) / 2
+    Xe[[j]] <- cbind(X[,lb:ub], Matrix::Matrix(0, nrow = nobs, ncol = 2 * dj))
+    lb <- lb + p_vec[j]
+    if (j < length(p_vec)) ub <- ub + p_vec[j+1]
   }
+
+  ## reduce to matrix
+  Xe <- do.call(cbind, Xe)
+  return(Xe)
 }
 
-#' Define constrains
+#' Define inputs for constrains
 #' @param pvec A vector of length K where each element corresponds to the level of k-th variable.
 #' @param regularize A boolena argument.
 al_set_opt_input <- function(p_vec, regularize, lambda = 1) {
@@ -158,14 +197,21 @@ al_set_opt_input <- function(p_vec, regularize, lambda = 1) {
     ## Example
     ## - pvec = c(1, 2, 3)
     ## - A has the following structure
+    ##
     ##      | 0 , 0  , 0  | /* no constraints on the intercept
     ##      | 0 , L2 , 0  | /* define pairwise difference
     ##  A = | 0 , 0  , L3 | /* define pairwise difference
-    ##      | 0 , W2 , W3 | /* weighted sum of theta+ and theta -
+    ##      | 0 , w2 , w3 | /* weighted sum of theta+ and theta -
     ##      | 0 , M2 , 0  | /* positivity constarints
     ##      | 0 , 0  , M3 | /* positivity constrains
+    ##
     ## where
-    ##  Lj =
+    ##  Lj = | Dj, I, I |
+    ##       |  1, 0, 0 |
+    ## with
+    ##                            | 1, -1 ,  0 |
+    ##  D2 = | 1, -1 |  and  D3 = | 1,  0 , -1 |
+    ##                            | 0,  1 , -1 |
     ## and
     ##  Mj = |0, I, 0|
     ##       |0, 0, I|
@@ -231,9 +277,10 @@ al_set_opt_input <- function(p_vec, regularize, lambda = 1) {
     ##  - p_vec = c(1, 2, 3)
     ##  - first element is always 1 corresponding to the intercept
     ##  - A has the following structure:
-    ##      1, 0, 0, 0, 0, 0
-    ##      0, 1, 1, 0, 0, 0
-    ##      0, 0, 0, 1, 1, 1
+    ##
+    ##        | 1, 0, 0, 0, 0, 0 |
+    ##    A = | 0, 1, 1, 0, 0, 0 |
+    ##        | 0, 0, 0, 1, 1, 1 |
     ##
     ## - Then, we set A[1,1] = 0
     ##   because intercept does not have a constraint.
