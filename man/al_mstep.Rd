@@ -4,7 +4,7 @@
 \alias{al_mstep}
 \title{M-step function to solve quadratic programming.}
 \usage{
-al_mstep(y, X, trials, omega, p_vec)
+al_mstep(y, X, trials, omega, opt_input)
 }
 \description{
 M-step function to solve quadratic programming.

@@ -22,16 +22,13 @@ anova_logit <- function(y, X, trials = NULL, option = list()) {
   params <- al_em_run(y, X, trials, option)
 
   ## fitted value ------------------------------
-  betas  <- params[[1]][['beta']]
-  fitted <- 1 / (1 + exp(-as.vector(X %*% betas)))
+  betas  <- params$coefficient
+  params$fitted <- 1 / (1 + exp(-as.vector(X %*% betas)))
 
   ## return estimates --------------------------
-  option$iteration      <- params$iteration
-  option$convergence    <- params$convergence
-  attr(betas, "option") <- option
-  attr(betas, "fitted") <- fitted
-  class(betas)          <- c("anova_logit")
-  return(betas)
+  attr(params, "option") <- option
+  class(params)          <- c("anova_logit")
+  return(params)
 }
 
 
@@ -42,6 +39,9 @@ al_em_run <- function(y, X, trials, option) {
   ## initialize parameters
   params <- vector("list", length = option$max_iter)
   params <- al_params_initialize(X, params)
+
+  ## define constrains
+  opt_input <- al_set_opt_input(option$pvec, option$regularize)
 
   # set trials
   if (is.null(trials)) trials <- rep(1, length(y))
@@ -54,7 +54,7 @@ al_em_run <- function(y, X, trials, option) {
     params[[iter]]$omega <- al_estep(X, params[[iter]]$beta)
 
     ## M-step ---------------------------------------------
-    params[[iter+1]]$beta <- al_mstep(y, X, trials, params[[iter]]$omega, option$pvec)
+    params[[iter+1]]$beta <- al_mstep(y, X, trials, params[[iter]]$omega, opt_input)
 
     ## check_convergence
     if (iter > 1 &&
@@ -66,8 +66,9 @@ al_em_run <- function(y, X, trials, option) {
 
 
   ## remve NULL elements and returns the final estimate
-  par <- params[purrr::map_lgl(params, ~!is.null(.x))]
-  par <- par[length(par)]
+  params <- params[purrr::map_lgl(params, ~!is.null(.x))]
+  par  <- vector("list")
+  par$coefficient <- params[[length(params)]][['beta']]
   par$iteration   <- iter
   par$convergence <- if_else(iter < option$max_iter, 1, 0)
   return(par)
@@ -88,18 +89,20 @@ al_estep <- function(X, betas) {
 
 #' M-step function to solve quadratic programming.
 #' @keywords internal
-al_mstep <- function(y, X, trials, omega, p_vec) {
+al_mstep <- function(y, X, trials, omega, opt_input) {
   ## prepare inputs
   XO   <- t(X) %*% diag(omega)
   Dmat <- XO %*% X
   dvec <- as.vector(XO %*% ((y - trials / 2) / omega))
-  Amat <- create_Amat(pvec = p_vec); Amat[1,1] <- 0 ## no const on the intercept
-  bvec <- rep(0, length(p_vec))
+
+  Amat   <- opt_input$Amat
+  lb_vec <- opt_input$lb
+  ub_vec <- opt_input$ub
 
   ## solve QP
   ## can we pass the initial base?
   settings <- osqp::osqpSettings(verbose = FALSE, eps_abs = 1e-5, eps_rel = 1e-5)
-  fit      <- osqp::solve_osqp(Dmat, -dvec, Amat, l = bvec, u = bvec, pars = settings)
+  fit      <- osqp::solve_osqp(Dmat, -dvec, Amat, l = lb_vec, u = ub_vec, pars = settings)
 
   return(fit$x)
 }
@@ -119,9 +122,31 @@ al_set_option <- function(option) {
   if (isFALSE(exists('tol', option))) option$tol <- 1e-5
 
   ## set regularization options
-  if (isFALSE(exists('regularize', option))) option$regularize <- TRUE
+  if (isFALSE(exists('regularize', option))) option$regularize <- FALSE
 
   return(option)
+}
+
+
+#' Define constrains
+#' @param pvec A vector of length K where each element corresponds to the level of k-th variable.
+#' @param regularize A boolena argument.
+al_set_opt_input <- function(p_vec, regularize) {
+  if (isTRUE(regularize)) {
+
+  } else {
+    ## impose sum to zero constraints
+    Amat <- create_Amat(pvec = p_vec);
+    ## intercept is constraint free
+    Amat[1,1] <- 0
+    # linear equality constraint (sum to zero)
+    lb <- ub <- rep(0, length(p_vec))
+  }
+
+  ## set of constrains
+  opt_input <- list(Amat = Amat, lb = lb, ub = ub)
+
+  return(opt_input)
 }
 
 
@@ -144,8 +169,9 @@ al_params_initialize <- function(X, params) {
 #' Compute predicted probabilities
 #' @export
 predict.anova_logit <- function(fit, newdata = NULL) {
+  if (isFALSE('anova_logit' %in% class(fit))) stop("input has to be an 'anova_logit' object.")
   if (is.null(newdata)) {
-    fitted <- attr(fit, "fitted")
+    fitted <- fit$fitted
   } else {
     fitted <- 1 / (1 + exp(-newdata %*% fit))
   }
