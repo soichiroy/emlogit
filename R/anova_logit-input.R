@@ -144,9 +144,9 @@ al_set_opt_input <- function(p_vec, regularize, lambda = 1) {
     ##      | 0 , 0  , 0  | /* no constraints on the intercept
     ##      | 0 , L2 , 0  | /* define pairwise difference
     ##  A = | 0 , 0  , L3 | /* define pairwise difference
-    ##      | 0 , w2 , w3 | /* weighted sum of theta+ and theta -
+    ##      | 0 , w2 , w3 | /* weighted sum of theta+ and theta-
     ##      | 0 , M2 , 0  | /* positivity constarints
-    ##      | 0 , 0  , M3 | /* positivity constrains
+    ##      | 0 , 0  , M3 | /* positivity constraints
     ##
     ## where
     ##  Lj = | Dj, I, I |
