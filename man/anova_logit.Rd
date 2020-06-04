@@ -4,12 +4,17 @@
 \alias{anova_logit}
 \title{Logistic regression with ANOVA style parametrization.}
 \usage{
-anova_logit(y, X, option = list())
+anova_logit(y, X, trials = NULL, option = list())
 }
 \arguments{
-\item{y}{a vector of binary responses.}
+\item{y}{A vector of binary responses. In the binomial response, this corresponds to "success".}
 
-\item{X}{a matrix of overparametrized}
+\item{X}{A matrix of overparametrized}
+
+\item{trials}{A vector of trial counts. In the binary outcome this is left as \code{NULL}.
+The lengh of this vector should match the length of \code{y}.}
+
+\item{option}{A list of options. \code{pvec} should be provided.}
 }
 \description{
 Logistic regression with ANOVA style parametrization.
