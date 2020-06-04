@@ -78,6 +78,10 @@ al_em_run <- function(y, X, trials, option) {
   par$coefficient <- params[[length(params)]][['beta']]
   par$iteration   <- iter
   par$convergence <- if_else(iter < option$max_iter, 1, 0)
+
+  ## comptue BIC
+  par$BIC <- al_compute_BIC(y, X, trials, par$coefficient, option$pvec)
+
   return(par)
 }
 
@@ -103,12 +107,12 @@ al_mstep <- function(y, X, trials, omega, opt_input) {
   Dmat <- XO %*% X
   dvec <- as.vector(XO %*% ((y - trials / 2) / omega))
 
+  ## constraints
   Amat   <- opt_input$Amat
   lb_vec <- opt_input$lb
   ub_vec <- opt_input$ub
 
   ## solve QP
-  ## can we pass the initial base?
   settings <- osqp::osqpSettings(verbose = FALSE, eps_abs = 1e-5, eps_rel = 1e-5)
   fit      <- osqp::solve_osqp(Dmat, -dvec, Amat, l = lb_vec, u = ub_vec, pars = settings)
 
@@ -124,4 +128,37 @@ al_check_convergence <- function(params) {
   max_diff <- max( abs(unlist(params[[1]]) - unlist(params[[2]])) /
                       abs(unlist(params[[1]])) )
   return(max_diff)
+}
+
+
+
+#' Likelihood function
+#' @keywords internal
+al_log_likelihood <- function(y, X, trials, betas) {
+  if (is.null(trials)) trials <- rep(1, length(y))
+
+  ## Compute Pr(Y = 1 | X)
+  pY <- 1 / (1 + exp(- X %*% betas))
+
+  ## log-likelihood
+  ll <- sum(y * log(pY) + (trials - y) * log(1 - pY))
+
+  return(ll)
+
+}
+
+
+#' Compute BIC
+#' @keywords internal
+al_compute_BIC <- function(y, X, trials, betas, p_vec, thres = 1e-4) {
+  betas[abs(betas) <= thres] <- 0
+  np   <- length(p_vec)
+  nobs <- length(y)
+
+  ## compute the degree of freedom
+  df <- sum(betas != 0) - (np - 1)
+
+  ## BIC = df * log(n) - 2 * LL
+  BIC <- log(nobs) * df - 2 * al_log_likelihood(y, X, trials, betas)
+  return(BIC)
 }
