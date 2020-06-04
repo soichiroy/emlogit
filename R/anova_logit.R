@@ -124,6 +124,7 @@ al_set_option <- function(option) {
   if (isFALSE(exists('tol', option))) option$tol <- 1e-5
 
   ##
+  if (isFALSE(exists('regularization', option))) option$reg <- TRUE
 
   return(option)
 }
