@@ -41,7 +41,7 @@ al_em_run <- function(y, X, trials, option) {
   params <- al_params_initialize(X, params)
 
   ## define constrains
-  opt_input <- al_set_opt_input(option$pvec, option$regularize, option$lambda)
+  opt_input <- al_set_opt_input(option$pvec, option$regularize, option$lambda, option$wj)
 
   ## Expand the design matrix
   Xe <- al_expand_X(X, option$pvec, option$regularize)
@@ -54,7 +54,7 @@ al_em_run <- function(y, X, trials, option) {
   ##
   for (iter in seq_len(option$max_iter)) {
     ## E-step ---------------------------------------------
-    params[[iter]]$omega <- al_estep(X, params[[iter]]$beta)
+    params[[iter]]$omega <- al_estep(X, trials, params[[iter]]$beta)
 
     ## M-step ---------------------------------------------
     params[[iter+1]]$beta <- al_mstep(y, Xe, trials, params[[iter]]$omega, opt_input)
@@ -92,9 +92,9 @@ al_em_run <- function(y, X, trials, option) {
 
 #' E-step function to compute the expectation of omega.
 #' @keywords internal
-al_estep <- function(X, betas) {
+al_estep <- function(X, trials, betas) {
   Xb    <- X %*% betas
-  omega <- as.vector(tanh(Xb / 2) / (2 * Xb))
+  omega <- as.vector(tanh(Xb / 2) * trials / (2 * Xb))
   return(omega)
 }
 

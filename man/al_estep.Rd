@@ -4,7 +4,7 @@
 \alias{al_estep}
 \title{E-step function to compute the expectation of omega.}
 \usage{
-al_estep(X, betas)
+al_estep(X, trials, betas)
 }
 \description{
 E-step function to compute the expectation of omega.

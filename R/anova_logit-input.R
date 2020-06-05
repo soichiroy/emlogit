@@ -1,7 +1,7 @@
 #' Prepare Data
 #' @import Formula
+#' @import Matrix
 #' @importFrom rlang !! sym
-#' @importFrom Matrix Matrix
 #' @export
 al_data <- function(formula, data) {
 
@@ -56,10 +56,18 @@ al_data <- function(formula, data) {
     Xlist[[x_names[i]]] <- Matrix(model.matrix(x_formula, data = data))
   }
 
+  ## compute number of observations in each categor / factor
+  nj <- purrr::map(Xlist[-1], ~colSums(.x))
+
+  ## create p_vec
+  p_vec <- c('intercept' = 1, sapply(nj, length))
+
+  ## compute regularization weights
+  wj <- al_compute_weights(nj, p_vec)
 
   Xdesign <- do.call("cbind", Xlist)
 
-  return(list(y = outcome, trials = trials, X = Xdesign))
+  return(list(y = outcome, trials = trials, X = Xdesign, nj = nj, pvec = p_vec, wj = wj))
 }
 
 
@@ -101,9 +109,11 @@ al_expand_X <- function(X, p_vec, regularize) {
   }
 
   ##
-  ## Expand the original design matrix X[j] with dimension p[j] to
-  ## Xe[j] with dimension p[j] + 2 * d[j] where d[j] = p[j] * (p[j] - 1) / 2
-  ##  by augmenting Xe[j] = [X[j], 0] where 0 has dimension n by d[j]
+  ## Augment the original design matrix with zeros:
+  ## - Orginal design matrix: X[j] with dimension p[j]
+  ## - Augmented matrix: Xe[j] with dimension p[j] + 2 * d[j]
+  ##      where d[j] = p[j] * (p[j] - 1) / 2
+  ##      by augmenting Xe[j] = [X[j], 0] where 0 has dimension n by d[j]
   ##
 
   Xe  <- vector("list", length(p_vec))
@@ -131,7 +141,7 @@ al_expand_X <- function(X, p_vec, regularize) {
 #' Define inputs for constrains
 #' @param pvec A vector of length K where each element corresponds to the level of k-th variable.
 #' @param regularize A boolena argument.
-al_set_opt_input <- function(p_vec, regularize, lambda = 1) {
+al_set_opt_input <- function(p_vec, regularize, lambda = 1, wj = 1) {
   if (isTRUE(regularize)) {
     ##
     ## Regularized problem
@@ -185,9 +195,14 @@ al_set_opt_input <- function(p_vec, regularize, lambda = 1) {
       )
 
       ## create theta+ + theta- <= t constraints
-      weigths   <- 1
+      if (is.null(wj)) {
+        weights <- rep(1, 2 * dj)
+      } else {
+        weigths <- rep(wj[[j]], 2)
+      }
+
       zero_ones <- Matrix::Matrix(c(rep(0, p_vec[j]),
-                                    rep(weigths, 2 * dj)), nrow = 1)
+                                    weigths), nrow = 1)
       Sj[[j]] <- zero_ones
 
       ## positivity constraints
@@ -245,4 +260,38 @@ al_set_opt_input <- function(p_vec, regularize, lambda = 1) {
   opt_input <- list(Amat = Amat, lb = lb, ub = ub)
 
   return(opt_input)
+}
+
+
+
+al_compute_weights <- function(nj, p_vec) {
+  ##
+  ## Compute weights of the form
+  ##  wj[k~m] = sqrt(nj[k] + nj[m]) / (p_vec[j] + 1)
+  ##
+
+  ## no weights for the intercept
+  wj_list <- vector("list", length = length(p_vec))
+  wj_list[[1]] <- 1
+  for (j in 2:length(p_vec)) {
+    ## factor levels
+    pj <- p_vec[j]
+    dj <- pj * (pj - 1) / 2
+    wj <- vector('double', length = dj)
+
+    ## pair-wise counts
+    iter <- 1
+    for (p1 in 1:(p_vec[j]-1)) {
+      for (p2 in (p1+1):p_vec[j]) {
+        n1 <- nj[[j-1]][p1]
+        n2 <- nj[[j-1]][p2]
+        wj[iter] <- sqrt(n1 + n2) / (pj + 1)
+        iter <- iter + 1
+      }
+    }
+
+    wj_list[[j]] <- wj
+  }
+
+  return(wj_list)
 }
