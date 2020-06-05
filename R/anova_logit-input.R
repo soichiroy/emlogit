@@ -3,7 +3,7 @@
 #' @import Matrix
 #' @importFrom rlang !! sym
 #' @export
-al_data <- function(formula, data) {
+al_data <- function(formula, data, adaptive_weight = FALSE) {
 
   if (isFALSE('formula' %in% class(formula))) formula <- as.formula(formula)
 
@@ -67,10 +67,49 @@ al_data <- function(formula, data) {
 
   Xdesign <- do.call("cbind", Xlist)
 
+
+  if (isTRUE(adaptive_weight)) {
+    wj <- al_compute_adaptive_weights(outcome, Xdesign, trials, p_vec, wj)
+  }
+
   return(list(y = outcome, trials = trials, X = Xdesign, nj = nj, pvec = p_vec, wj = wj))
 }
 
 
+al_compute_adaptive_weights <- function(y, X, trials, pvec, wj) {
+  ## fit anova_logit without regularization
+  fit <- anova_logit(
+    y = y,
+    X = X,
+    trials = trials,
+    option = list(regularize = FALSE, pvec = pvec)
+  )
+
+  ## obtain coefficients
+  coefs <- fit$coef
+  nobs  <- sum(trials)
+
+  ## compute adaptive weights
+  lb <- 2; ub <- 1
+  for (j in 2:length(wj)) {
+    pj <- pvec[j]
+    dj <- pj * (pj - 1) / 2
+
+    ub <- ub + pj
+    betaj <- coefs[lb:ub]
+    lb <- lb + pj
+    iter <- 1
+    for (p1 in 1:(pvec[j]-1)) {
+      for (p2 in (p1+1):pvec[j]) {
+        wj[[j]][iter] <- wj[[j]][iter] / (sqrt(nobs) * abs(betaj[p1] - betaj[p2]))
+        iter <- iter + 1
+      }
+    }
+  }
+
+  return(wj)
+
+}
 
 #' Initialize coefficients
 #' @keywords internal
@@ -112,8 +151,8 @@ al_expand_X <- function(X, p_vec, regularize) {
   ## Augment the original design matrix with zeros:
   ## - Orginal design matrix: X[j] with dimension p[j]
   ## - Augmented matrix: Xe[j] with dimension p[j] + 2 * d[j]
-  ##      where d[j] = p[j] * (p[j] - 1) / 2
-  ##      by augmenting Xe[j] = [X[j], 0] where 0 has dimension n by d[j]
+  ##   where d[j] = p[j] * (p[j] - 1) / 2
+  ##   by augmenting Xe[j] = [X[j], 0] where 0 has dimension n by d[j]
   ##
 
   Xe  <- vector("list", length(p_vec))
@@ -186,6 +225,7 @@ al_set_opt_input <- function(p_vec, regularize, lambda = 1, wj = 1) {
         }
       }
 
+      ## this is for sum-to-zero constraints
       one_zero_j <- Matrix::Matrix(c(rep(1, p_vec[j]), rep(0, 2 * dj)), nrow = 1)
       Ij <- Matrix::Diagonal(dj)
 
@@ -198,11 +238,11 @@ al_set_opt_input <- function(p_vec, regularize, lambda = 1, wj = 1) {
       if (is.null(wj)) {
         weights <- rep(1, 2 * dj)
       } else {
-        weigths <- rep(wj[[j]], 2)
+        weights <- rep(wj[[j]], 2)
       }
 
       zero_ones <- Matrix::Matrix(c(rep(0, p_vec[j]),
-                                    weigths), nrow = 1)
+                                    weights), nrow = 1)
       Sj[[j]] <- zero_ones
 
       ## positivity constraints

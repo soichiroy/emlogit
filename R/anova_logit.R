@@ -57,24 +57,23 @@ al_em_run <- function(y, X, trials, option) {
     params[[iter]]$omega <- al_estep(X, trials, params[[iter]]$beta)
 
     ## M-step ---------------------------------------------
-    params[[iter+1]]$beta <- al_mstep(y, Xe, trials, params[[iter]]$omega, opt_input)
+    beta_full <- al_mstep(y, Xe, trials, params[[iter]]$omega, opt_input)
 
     ## discard slack variables ----------------------------
     if (isTRUE(option$regularize)) {
-      params[[iter+1]]$beta <- al_subset_beta(params[[iter+1]]$beta, option$pvec)
+      params[[iter+1]]$beta <- al_subset_beta(beta_full, option$pvec)
+    } else {
+      params[[iter+1]]$beta <- beta_full
     }
 
     ## check_convergence ----------------------------------
-    if (iter > 1 &&
-        al_check_convergence(params[c(iter - 1, iter)]) < option$tol
-      ) {
-        break;
-    }
+    if (iter > 1 && al_check_convergence(params[c(iter - 1, iter)]) < option$tol) break;
+
   } ## end of estimation iterations
 
   ## remve NULL elements and returns the final estimate
-  params <- params[purrr::map_lgl(params, ~!is.null(.x))]
-  par    <- vector("list")
+  params          <- params[purrr::map_lgl(params, ~!is.null(.x))]
+  par             <- vector("list")
   par$coefficient <- params[[length(params)]][['beta']]
   par$iteration   <- iter
   par$convergence <- if_else(iter < option$max_iter, 1, 0)

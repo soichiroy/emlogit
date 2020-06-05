@@ -4,7 +4,7 @@
 \alias{al_data}
 \title{Prepare Data}
 \usage{
-al_data(formula, data)
+al_data(formula, data, adaptive_weight = FALSE)
 }
 \description{
 Prepare Data

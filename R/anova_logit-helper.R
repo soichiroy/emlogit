@@ -28,12 +28,13 @@ al_subset_beta <- function(beta_full, p_vec) {
 
   beta_sub <- vector("list", length = length(p_vec))
   beta_sub[[1]] <- beta_full[1]
-  lb <- 2; ub <- 0
+  csum <- cumsum(p_vec)
+  lb <- csum[1] + 1
   for (j in 2:length(p_vec)) {
     dj <- p_vec[j] * (p_vec[j] - 1) / 2
-    ub <- ub + (p_vec[j] + 2 * dj)
     beta_sub[[j]] <- beta_full[lb:(lb + p_vec[j]-1)]
-    lb <- lb + ub
+    lb <- csum[j] + 1
   }
+
   return(unlist(beta_sub))
 }
