@@ -261,7 +261,9 @@ al_set_opt_input <- function(p_vec, regularize, lambda = 1, wj = 1) {
     ##
     ## Define: lb <= Ax <= ub
     ##
-    lb <- ub <- rep(0, nrow(Lj_block))    #* Lj * b = 0
+    epsilon <- 0
+    ub <- rep(epsilon, nrow(Lj_block))    #* Lj * b = 0
+    lb <- rep(-epsilon, nrow(Lj_block))   #* Lj * b = 0
     lb <- c(lb, 0)                        #* lb for Sj = 0
     ub <- c(ub, lambda)                   #* ub for Sj = lambda
     lb <- c(lb, rep(0, nrow(Pj_block)))   #* positivity constrains on theta+-

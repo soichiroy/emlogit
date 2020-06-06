@@ -33,7 +33,7 @@ al_subset_beta <- function(beta_full, p_vec) {
   for (j in 2:length(p_vec)) {
     dj <- p_vec[j] * (p_vec[j] - 1) / 2
     beta_sub[[j]] <- beta_full[lb:(lb + p_vec[j]-1)]
-    lb <- csum[j] + 1
+    lb <- lb + p_vec[j] + 2 * dj
   }
 
   return(unlist(beta_sub))

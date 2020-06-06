@@ -67,7 +67,8 @@ al_em_run <- function(y, X, trials, option) {
     }
 
     ## check_convergence ----------------------------------
-    if (iter > 1 && al_check_convergence(params[c(iter - 1, iter)]) < option$tol) break;
+    if (iter > 1 && 
+        al_check_convergence(params[c(iter - 1, iter)]) < option$tol) break;
 
   } ## end of estimation iterations
 

@@ -17,7 +17,7 @@ japan <- japan %>%
   mutate(age_bin = ntile(age, 10))
 
 xx <- al_data(
-  formula = LDP | n ~  education + age_bin + gender,
+  formula = LDP | n ~  gender + age_bin,
   data = japan,
   adaptive_weight = FALSE
 )
@@ -39,12 +39,12 @@ sum(coef_res[str_detect(names(coef_res), "education")])
 sum(coef_res[str_detect(names(coef_res), "age_bin")])
 
 # debugonce(al_em_run)
-set.seed(1234)
+set.seed(1235)
 fit <- anova_logit(
   y = xx$y,
   X = xx$X,
   trials = xx$trials,
-  option = list(regularize = TRUE, pvec = xx$pvec, lambda = 3, wj = xx$wj)
+  option = list(regularize = TRUE, pvec = xx$pvec, lambda = 3, wj = NULL) # xx$wj)
 )
 
 coef_res <- fit$coef
