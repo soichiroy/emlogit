@@ -37,6 +37,10 @@ names(coef_res) <- c("intercept", unlist(map(xx$nj, ~names(.x))))
 sum(coef_res[str_detect(names(coef_res), "gender")])
 sum(coef_res[str_detect(names(coef_res), "education")])
 sum(coef_res[str_detect(names(coef_res), "age_bin")])
+round(coef_res, 3)
+
+
+hist(fit$fitted)
 
 # debugonce(al_em_run)
 set.seed(1235)
