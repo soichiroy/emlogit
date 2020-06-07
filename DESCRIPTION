@@ -22,7 +22,9 @@ Imports:
     purrr,
     quadprog,
     osqp,
-    Matrix
+    Matrix,
+    Formula,
+    rlang
 Depends:
     dplyr,
     tidyr

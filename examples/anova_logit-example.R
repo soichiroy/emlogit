@@ -17,9 +17,9 @@ japan <- japan %>%
   mutate(age_bin = ntile(age, 10))
 
 xx <- al_data(
-  formula = LDP | n ~  gender + age_bin,
+  formula = LDP | n ~  gender + age_bin + education,
   data = japan,
-  adaptive_weight = FALSE
+  adaptive_weight = TRUE
 )
 
 
@@ -59,7 +59,7 @@ require(future)
 require(furrr)
 require(ggplot2)
 
-lambda_vec <- exp(seq(-3, 2, by = 0.1))
+lambda_vec <- exp(seq(-3, 3, by = 0.1))
 
 ## setup parallel computation
 plan(multiprocess)
@@ -94,6 +94,6 @@ names(coef_res) <- c("intercept", unlist(map(xx$nj, ~names(.x))))
 coef_res
 
 
-
-sum(coef_res[str_detect(names(coef_res), "gender")])
-sum(coef_res[str_detect(names(coef_res), "education")])
+par(mfrow = c(1, 2))
+hist(fit_reg[[which(BIC == min(BIC))]]$fitted)
+hist(xx$y/xx$trials)
