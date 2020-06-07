@@ -4,7 +4,7 @@
 \alias{print.summary.emlogit}
 \title{Print function}
 \usage{
-\method{print}{summary.emlogit}(obj)
+print.summary.emlogit(obj)
 }
 \arguments{
 \item{obj}{An output of \code{summary.emlogit()} function.}
