@@ -81,11 +81,11 @@ al_data <- function(formula, data, adaptive_weight = FALSE) {
 
 al_compute_adaptive_weights <- function(y, X, trials, pvec, wj) {
   ## fit anova_logit without regularization
-  fit <- anova_logit(
+  fit <- anova_logit.matrix(
     y = y,
     X = X,
     trials = trials,
-    option = list(regularize = FALSE, pvec = pvec)
+    option = al_set_option(list(regularize = FALSE, pvec = pvec))
   )
 
   ## obtain coefficients
@@ -125,19 +125,28 @@ al_params_initialize <- function(X, params) {
 #' Set default opiions
 #' @keywords internal
 al_set_option <- function(option) {
-  ## set maximum number of iterations
-  if (isFALSE(exists("max_iter", option))) option$max_iter <- 200
+  
+  ## set default option 
+  option_def <- list(
+    max_iter        = 200,
+    tol             = 1e-5,
+    regularize      = FALSE, 
+    lambda          = 1,
+    adaptive_weight = FALSE,
+    wj              = NULL,
+    pvec            = NULL
+  )
+  nmsC <- names(option_def)
 
-  ## set tolerance parameter for the convergence
-  if (isFALSE(exists('tol', option))) option$tol <- 1e-5
+  ## overwrite the default by the user specific options 
+  option_def[(namc <- names(option))] <- option 
 
-  ## set regularization options
-  if (isFALSE(exists('regularize', option))) option$regularize <- FALSE
-
-  ## set the default regularization parameter
-  if (isFALSE(exists('lambda', option))) option$lambda <- 1
-
-  return(option)
+  ## throw erros when unknown control is given 
+  if (length(noNms <- namc[!namc %in% nmsC])) {
+    warning("unknown names in control: ", paste(noNms, collapse = ", ")) 
+  }
+  
+  return(option_def)
 }
 
 
@@ -176,8 +185,6 @@ al_expand_X <- function(X, p_vec, regularize) {
   Xe <- do.call(cbind, Xe)
   return(Xe)
 }
-
-
 
 
 #' Define inputs for constrains
