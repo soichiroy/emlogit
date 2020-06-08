@@ -14,7 +14,8 @@ al_data <- function(formula, data, adaptive_weight = FALSE) {
     ## obtain variable names
     outcome_name <- all.vars(formula(fm, lhs = 1, rhs = 0))
     trials_name  <- all.vars(formula(fm, lhs = 2, rhs = 0))
-
+    covar_name   <- all.vars(formula(fm, lhs = 0, rhs = 1))
+    
     ## obtain variable values
     outcome <- dplyr::pull(data, !!sym(outcome_name))
     trials  <- dplyr::pull(data, !!sym(trials_name))
@@ -28,8 +29,10 @@ al_data <- function(formula, data, adaptive_weight = FALSE) {
     outcome_name <- all.vars(fm)[1]
     outcome <- as.numeric(dplyr::pull(data, !!sym(outcome_name)))
     trials  <- NULL
+    covar_name <- all.vars(fm)[-1]
   }
-
+  
+  
   if (!any(c("numeric", "integer") %in% class(outcome))) {
     ## check if the outcome variable is numeric
     stop("Outcome variable should be numeric.")
@@ -72,7 +75,7 @@ al_data <- function(formula, data, adaptive_weight = FALSE) {
     wj <- al_compute_adaptive_weights(outcome, Xdesign, trials, p_vec, wj)
   }
 
-  return(list(y = outcome, trials = trials, X = Xdesign, nj = nj, pvec = p_vec, wj = wj))
+  return(list(y = outcome, trials = trials, X = Xdesign, nj = nj, pvec = p_vec, wj = wj, covar_name = covar_name))
 }
 
 
@@ -261,7 +264,7 @@ al_set_opt_input <- function(p_vec, regularize, lambda = 1, wj = 1) {
     ##
     ## Define: lb <= Ax <= ub
     ##
-    epsilon <- 0
+    epsilon <- 1e-8
     ub <- rep(epsilon, nrow(Lj_block))    #* Lj * b = 0
     lb <- rep(-epsilon, nrow(Lj_block))   #* Lj * b = 0
     lb <- c(lb, 0)                        #* lb for Sj = 0

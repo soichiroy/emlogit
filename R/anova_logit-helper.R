@@ -24,8 +24,10 @@ create_Amat_unreg <- function(pvec) {
 
 #' Subset beta
 #' @keywords internal
-al_subset_beta <- function(beta_full, p_vec) {
+al_subset_beta <- function(beta_full, p_vec, regularize) {
 
+  if (isFALSE(regularize)) return(beta_full)
+  
   beta_sub <- vector("list", length = length(p_vec))
   beta_sub[[1]] <- beta_full[1]
   csum <- cumsum(p_vec)

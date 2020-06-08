@@ -60,11 +60,9 @@ al_em_run <- function(y, X, trials, option) {
     beta_full <- al_mstep(y, Xe, trials, params[[iter]]$omega, opt_input)
 
     ## discard slack variables ----------------------------
-    if (isTRUE(option$regularize)) {
-      params[[iter+1]]$beta <- al_subset_beta(beta_full, option$pvec)
-    } else {
-      params[[iter+1]]$beta <- beta_full
-    }
+    params[[iter+1]]$beta <- al_subset_beta(
+      beta_full, option$pvec, option$regularize
+    )
 
     ## check_convergence ----------------------------------
     if (iter > 1 && 

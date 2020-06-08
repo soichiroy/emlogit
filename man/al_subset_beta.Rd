@@ -4,7 +4,7 @@
 \alias{al_subset_beta}
 \title{Subset beta}
 \usage{
-al_subset_beta(beta_full, p_vec)
+al_subset_beta(beta_full, p_vec, regularize)
 }
 \description{
 Subset beta
