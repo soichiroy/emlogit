@@ -67,10 +67,10 @@ require(future)
 require(furrr)
 require(ggplot2)
 require(purrr)
-require(dplyr)
+require(tidyverse)
 
 ## range of regularization parameters
-lambda_vec <- exp(seq(-3.1, 3, by = 0.1))
+lambda_vec <- exp(seq(-4, 3, by = 0.1))
 
 ## setup parallel computation
 plan(multiprocess)
@@ -81,7 +81,8 @@ fit_reg <- furrr::future_map(
   lambda_vec, ~ anova_logit(
     LDP | n ~  gender + age_bin + education,
     data = japan, 
-    option = list(regularize = TRUE, lambda = .x, adaptive_weight = FALSE)
+    option = list(regularize = TRUE, lambda = .x, 
+      adaptive_weight = FALSE, max_iter = 500)
   ), .progress = TRUE
 )
 

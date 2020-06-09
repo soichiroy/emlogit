@@ -17,7 +17,7 @@
 al_em_run <- function(y, X, trials, option) {
 
   ## initialize parameters
-  params <- vector("list", length = option$max_iter)
+  params <- vector("list", length = option$max_iter+1)
   params <- al_params_initialize(X, params)
 
   ## define constrains
@@ -47,7 +47,9 @@ al_em_run <- function(y, X, trials, option) {
     ## check_convergence ----------------------------------
     if (iter > 1 && 
         al_check_convergence(params[c(iter - 1, iter)]) < option$tol) break;
-
+    if (iter > 1 && option$verbose) {
+      cat("Diff = ", al_check_convergence(params[c(iter - 1, iter)]), "\n")
+    }  
   } ## end of estimation iterations
 
   ## remve NULL elements and returns the final estimate

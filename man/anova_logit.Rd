@@ -3,14 +3,11 @@
 \name{anova_logit}
 \alias{anova_logit}
 \alias{anova_logit.default}
-\alias{anova_logit.matrix}
 \title{Logistic regression with ANOVA style parametrization.}
 \usage{
 anova_logit(...)
 
 \method{anova_logit}{default}(formula, data, option = list())
-
-\method{anova_logit}{matrix}(y, X, trials = NULL, option = list())
 }
 \arguments{
 \item{formula}{An object of class "formula": 
@@ -22,13 +19,6 @@ symbolic description of the model to be fitted in the form
 \item{data}{Data frame.}
 
 \item{option}{A list of options. \code{pvec} should be provided.}
-
-\item{y}{A vector of binary responses. In the binomial response, this corresponds to "success".}
-
-\item{X}{A matrix of overparametrized design matrix.}
-
-\item{trials}{A vector of trial counts. In the binary outcome this is left as \code{NULL}.
-The lengh of this vector should match the length of \code{y}.}
 }
 \description{
 Logistic regression with ANOVA style parametrization.
@@ -156,4 +146,3 @@ purrr::map_dbl(fit_reg, ~.x$BIC) \%>\%
   geom_point() +
   theme_bw()
 }
-\keyword{internal}

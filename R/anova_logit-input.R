@@ -134,7 +134,8 @@ al_set_option <- function(option) {
     lambda          = 1,
     adaptive_weight = FALSE,
     wj              = NULL,
-    pvec            = NULL
+    pvec            = NULL,
+    verbose         = FALSE 
   )
   nmsC <- names(option_def)
 
