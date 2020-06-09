@@ -26,7 +26,7 @@ anova_logit <- function(...) {
 #' @rdname anova_logit
 anova_logit.default <- function(formula, data, option = list()) {
   
-  ## ------------------------------------------------------
+  ## -------------------------------------------
   ## set the default value of the option parameters
   option <- al_set_option(option)
   
@@ -35,22 +35,37 @@ anova_logit.default <- function(formula, data, option = list()) {
   option$pvec <- dat_input$pvec
   option$wj   <- dat_input$wj
   
-  ## run EM -----------------------------------------------
-  params <- al_em_run(
+  ## fit 
+  fit <- anova_logit.matrix(
     y = dat_input$y,
     X = dat_input$X,
     trials = dat_input$trials, 
     option = option 
   )
-
-  ## fitted value -----------------------------------------
-  betas  <- params$coefficient
-  params$fitted <- 1 / (1 + exp(-as.vector(dat_input$X %*% betas)))
   
   ## name coefficients 
-  names(params$coef) <- c("intercept", unlist(map(dat_input$nj, ~names(.x))))
+  names(fit$coef) <- c("intercept", unlist(map(dat_input$nj, ~names(.x))))
 
-  ## return estimates -------------------------------------
+  return(fit)
+}
+
+#' @param y A vector of binary responses. In the binomial response, this corresponds to "success".
+#' @param X A matrix of overparametrized design matrix.
+#' @param trials A vector of trial counts. In the binary outcome this is left as \code{NULL}.
+#'  The lengh of this vector should match the length of \code{y}.
+#' @rdname anova_logit
+#' @keywords internal
+anova_logit.matrix <- function(y, X, trials = NULL, option = list()) {
+
+
+  ## EM ----------------------------------------
+  params <- al_em_run(y, X, trials, option)
+
+  ## fitted value ------------------------------
+  betas  <- params$coefficient
+  params$fitted <- 1 / (1 + exp(-as.vector(X %*% betas)))
+
+  ## return estimates --------------------------
   attr(params, "option") <- option
   class(params)          <- c("anova_logit")
   return(params)
