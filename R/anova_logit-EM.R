@@ -17,7 +17,7 @@
 al_em_run <- function(y, X, trials, option) {
 
   ## initialize parameters
-  params <- vector("list", length = option$max_iter)
+  params <- vector("list", length = option$max_iter + 1)
   params <- al_params_initialize(X, params)
 
   ## define constrains

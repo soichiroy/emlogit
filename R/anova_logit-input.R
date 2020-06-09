@@ -128,13 +128,14 @@ al_set_option <- function(option) {
   
   ## set default option 
   option_def <- list(
-    max_iter        = 200,
+    max_iter        = 500,
     tol             = 1e-5,
     regularize      = FALSE, 
     lambda          = 1,
     adaptive_weight = FALSE,
     wj              = NULL,
-    pvec            = NULL
+    pvec            = NULL,
+    verbose         = FALSE 
   )
   nmsC <- names(option_def)
 
