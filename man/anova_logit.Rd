@@ -34,10 +34,6 @@ The lengh of this vector should match the length of \code{y}.}
 Logistic regression with ANOVA style parametrization.
 }
 \examples{
-
-
-
-
 ##
 ## Example
 ##

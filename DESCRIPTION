@@ -20,7 +20,6 @@ Imports:
     RcppArmadillo,
     tibble,
     purrr,
-    quadprog,
     osqp,
     Matrix,
     Formula,

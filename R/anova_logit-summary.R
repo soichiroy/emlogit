@@ -6,7 +6,7 @@ predict.anova_logit <- function(fit, newdata = NULL) {
   if (is.null(newdata)) {
     fitted <- fit$fitted
   } else {
-    fitted <- 1 / (1 + exp(-newdata %*% fit))
+    fitted <- 1 / (1 + exp(-newdata %*% fit$coef))
   }
   return(fitted)
 }
