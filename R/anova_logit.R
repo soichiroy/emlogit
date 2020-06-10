@@ -7,7 +7,7 @@
 
 #' Logistic regression with ANOVA style parametrization.
 #' @aliases anova_logit
-#' @param option A list of options. \code{pvec} should be provided.
+#' @param option A list of options.
 #' @example examples/anova_logit-example.R
 #' @export
 #' @rdname anova_logit

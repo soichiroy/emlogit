@@ -21,7 +21,7 @@ symbolic description of the model to be fitted in the form
 
 \item{data}{Data frame.}
 
-\item{option}{A list of options. \code{pvec} should be provided.}
+\item{option}{A list of options.}
 
 \item{y}{A vector of binary responses. In the binomial response, this corresponds to "success".}
 
