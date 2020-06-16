@@ -59,7 +59,7 @@ create_input_matrix <- function(Lk_list) {
   for (k in seq_len(length(Lk_list))) {
     Lk <- Lk_list[[k]]
     zeros_Lk <- Matrix(0, nrow = 1, ncol = Lk)
-    Bk[[k]]  <- rbind(zeros_Lk, Diagonal(Lk))
+    Bk[[k]]  <- rbind(zeros_Lk, -Diagonal(Lk))
   }
 
   Bmat <- bdiag(Bk)
@@ -82,4 +82,61 @@ cbsw_prepare_params <- function(obj) {
 
 
   return(list(beta = beta_param, eta = eta_param))
+}
+
+
+#' Format data for CBSW 
+#' 
+cbsw_data <- function(
+  formula, data
+) {
+  
+  ## call anova logit data format 
+  dat <- al_data(format, data)
+}
+
+
+
+cbsw_admm <- function(option) {
+  
+  for (iter in 1:option$max_iter) {
+    
+    ## update β
+    
+    ## update η
+    
+    ## update residuals
+    
+    if (diff_obj < option$tol) {
+      break;
+    }
+  }
+  
+  
+}
+
+cbsw_update_beta <- function() {
+  
+}
+
+
+softThreshld <- function(x, lambda) {
+  return(sign(x) * pmax(abs(x) - lambda, 0))
+}
+
+
+#' Update eta 
+#' @import Matrix 
+#' @keywords internal
+cbsw_update_eta <- function(params, A, lambda) {
+  ## form y 
+  y <- as.vector(A %*% params$beta  + params$w)
+  
+  ## update eta by soft-thresholding 
+  eta <- softThreshld(y, lambda)
+  return(eta)
+}
+
+cbsw_update_resid <- function() {
+  
 }
