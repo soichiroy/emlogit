@@ -102,6 +102,7 @@ cbsw_prepare_params <- function(obj) {
 
 
 cbsw_admm <- function(params, data, const, option) {
+  data$n0  <- sum(data$y == 0)
   diff_obj <- 1
   for (iter in 1:option$max_iter) {
 
@@ -131,13 +132,15 @@ cbsw_update_beta <- function(params, data, const, option) {
   if (isTRUE(option$use_grad)) {
     fit <- optim(par = params$beta, fn = cbsw_main_objective_fn,
                  gr = cbsw_main_objective_gr,
-                 S = data$y, X = data$X, params = params,
+                 S = data$y, X = data$X, n0 = data$n0,
+                 params = params,
                  A = const$A, B = const$B, rho = const$rho,
                  method = "BFGS"
                )
   } else {
     fit <- optim(par = params$beta, fn = cbsw_main_objective_fn,
-                 S = data$y, X = data$X, params = params,
+                 S = data$S, X = data$X, n0 = data$n0,
+                 params = params,
                  A = const$A, B = const$B, rho = const$rho,
                  method = "BFGS"
                )
@@ -147,15 +150,14 @@ cbsw_update_beta <- function(params, data, const, option) {
 }
 
 
-cbsw_main_objective_fn <- function(par, S, X, params, A, B, rho) {
+
+cbsw_main_objective_fn <- function(par, S, X, n0, params, A, B, rho) {
   ## Objective
   ##
   ##    S * exp(-X'β) + (1 - S) * X'β + ρ/2 * (β'A'Aβ + 2y'Aβ)
   ##
   ## where y = Bη + w
   ##
-  
-  n0 <- sum(S == 0)
   
   ## construct y
   y <- B %*% params$eta + params$w
@@ -174,10 +176,7 @@ cbsw_main_objective_fn <- function(par, S, X, params, A, B, rho) {
 }
 
 
-cbsw_main_objective_gr <- function(par, S, X, params, A, B, rho) {
-  
-  ## 
-  n0 <- sum(S == 0)
+cbsw_main_objective_gr <- function(par, S, X, n0, params, A, B, rho) {
   
   ## compute y
   y <- B %*% params$eta + params$w
@@ -198,6 +197,7 @@ cbsw_main_objective_gr <- function(par, S, X, params, A, B, rho) {
   gr  <- (gr0 - gr1) / n0 + grp
   return(gr)
 }
+
 
 softThreshld <- function(x, lambda) {
   return(sign(x) * pmax(abs(x) - lambda, 0))
