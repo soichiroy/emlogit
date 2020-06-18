@@ -9,6 +9,18 @@
 #' @export
 CBSW <- function(formula, data, option) {
 
+
+  ## prepare inputs
+  data <- al_data(format, data)
+
+  ## create constraints
+  const <- create_input_matrix(as.list(data$pvec))
+
+  ## initialize parameters
+  params <- cbsw_prepare_params(const)
+
+  ## optimization
+  params <- cbsw_admm(params, data, const, option)
 }
 
 
@@ -30,7 +42,7 @@ create_input_matrix <- function(Lk_list) {
   Ak <- D <- dvec <- list()
   Ak[[1]] <- Matrix(0, nrow = 1, ncol = 1)
 
-  for (k in seq_len(length(Lk_list))) {
+  for (k in 2:length(Lk_list)) {
     Lk        <- Lk_list[[k]]
 
     ## Create differencing matrix
@@ -45,9 +57,9 @@ create_input_matrix <- function(Lk_list) {
     ## Ak = | 1 |
     ##      | D |
     ##
-    Ak[[k+1]] <- rbind(ones, Dk)
-    D[[k]]    <- Dk
-    dvec[[k]] <- nrow(Dk)
+    Ak[[k]]     <- rbind(ones, Dk)
+    D[[k-1]]    <- Dk
+    dvec[[k-1]] <- nrow(Dk)
   }
 
   Amat <- bdiag(Ak)
@@ -56,10 +68,10 @@ create_input_matrix <- function(Lk_list) {
   ## B = | 0 |
   ##     | I |
   Bk <- list()
-  for (k in seq_len(length(Lk_list))) {
+  for (k in 2:length(Lk_list)) {
     Lk <- Lk_list[[k]]
-    zeros_Lk <- Matrix(0, nrow = 1, ncol = Lk)
-    Bk[[k]]  <- rbind(zeros_Lk, -Diagonal(Lk))
+    zeros_Lk  <- Matrix(0, nrow = 1, ncol = dvec[[k-1]])
+    Bk[[k-1]] <- rbind(zeros_Lk, -Diagonal(dvec[[k-1]]))
   }
 
   Bmat <- bdiag(Bk)
@@ -75,6 +87,7 @@ create_input_matrix <- function(Lk_list) {
 cbsw_prepare_params <- function(obj) {
 
   ## Prepare β for f(β)
+  ## need to impose sum to one constraints
   beta_param <- rnorm(ncol(obj$A))
 
   ## Prepare η for g(η)
@@ -85,58 +98,126 @@ cbsw_prepare_params <- function(obj) {
 }
 
 
-#' Format data for CBSW 
-#' 
-cbsw_data <- function(
-  formula, data
-) {
-  
-  ## call anova logit data format 
-  dat <- al_data(format, data)
-}
+cbsw_admm <- function(params, data, const, option) {
 
-
-
-cbsw_admm <- function(option) {
-  
   for (iter in 1:option$max_iter) {
-    
+
     ## update β
-    
+    params$beta <- cbsw_update_beta(params, data, const, option)
+
     ## update η
-    
-    ## update residuals
-    
+    params$eta <- cbsw_update_eta(params, const)
+
+    ## update w
+    params$w <- cbsw_update_w(params, const)
+
     if (diff_obj < option$tol) {
       break;
     }
   }
-  
-  
+
+  return(params)
+
 }
 
-cbsw_update_beta <- function() {
-  
+
+#' Estimate beta
+#' @keywords internal
+cbsw_update_beta <- function(params, data, const, option) {
+
+  if (isTRUE(option$use_grad)) {
+    fit <- optim(par = params$beta, fn = cbsw_main_objective_fn,
+                 gr = cbsw_main_objective_gr,
+                 S = data$y, X = data$X, params = params,
+                 A = const$A, B = const$B, rho = const$rho,
+                 method = "BFGS"
+               )
+  } else {
+    fit <- optim(par = params$beta, fn = cbsw_main_objective_fn,
+                 S = data$S, X = data$X, params = params,
+                 A = const$A, B = const$B, rho = const$rho,
+                 method = "BFGS"
+               )
+  }
+
+  return(fit$par)
 }
 
+
+cbsw_main_objective_fn <- function(par, S, X, params, A, B, rho) {
+  ## Objective
+  ##
+  ##    S * exp(X'β) + (1 - S) * X'β + ρ/2 * (β'A'Aβ + 2y'Aβ)
+  ##
+  ## where y = Bη + w
+  ##
+
+  ## construct y
+  y <- B %*% params$eta + params$w
+
+  ## compute Aβ
+  Ab <- A %*% par
+
+  ## compute Xβ
+  Xb <- X %*% par
+
+  ## evaluate the objective
+  obj_main <- sum(S * exp(Xb) + (1 - S) * Xb)
+  obj_pen  <- rho/2 * (t(Ab) %*% Ab + 2 * y %*% Ab)
+
+  return(obj_main + obj_pen)
+}
+
+
+cbsw_main_objective_gr <- function(par, S, X, params, A, B, rho) {
+  ## compute y
+  y <- B %*% params$eta + params$w
+
+  ## AA
+  AA <- t(A) %*% A
+
+  ## condition on S
+  X1 <- X[S == 1, ]
+  X0 <- X[S == 0, ]
+
+  X1b <- X1 %*% par
+
+  ## compute gradient
+  gr1 <- t(X1) %*% exp(X1b)
+  gr0 <- colSums(X0)
+  grp <- rho * AA %*% par + rho * t(y) %*% A
+  gr  <- gr1 + gr0 + grp
+  return(gr)
+}
 
 softThreshld <- function(x, lambda) {
   return(sign(x) * pmax(abs(x) - lambda, 0))
 }
 
 
-#' Update eta 
-#' @import Matrix 
+#' Update eta
+#' @param params A list object of parameters.
+#' @param A A matrix in the constrains.
+#' @param lambda A scalar or a vector of regularization parameters.
+#' @return A vector of η parameter in the objective.
+#' @import Matrix
 #' @keywords internal
-cbsw_update_eta <- function(params, A, lambda) {
-  ## form y 
-  y <- as.vector(A %*% params$beta  + params$w)
-  
-  ## update eta by soft-thresholding 
-  eta <- softThreshld(y, lambda)
+cbsw_update_eta <- function(params, const) {
+  ## form y
+  y <- as.vector(const$A %*% params$beta  + params$w)
+
+  ## update eta by soft-thresholding
+  eta <- softThreshld(y, const$lambda)
   return(eta)
 }
 
-cbsw_update_resid <- function() {
-  
+
+#' Update scaled slack variable
+#' @param params A list of parameter object.
+#' @param A A matrix in the constraint. Aβ + Bη = c.
+#' @param B B matrix in the constraint: Aβ + Bη = c.
+#' @keywords internal
+cbsw_update_w <- function(params, const) {
+    w <- const$A %*% params$beta + const$B %*% params$eta + params$w
+    return(w)
 }
