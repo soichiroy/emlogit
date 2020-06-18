@@ -4,7 +4,8 @@
 \alias{al_compute_BIC}
 \title{Compute BIC}
 \usage{
-al_compute_BIC(y, X, trials, betas, p_vec, thres = 1e-04)
+al_compute_BIC(y, X, trials, betas, p_vec, thres = 1e-04, EBIC = TRUE,
+  gm = 0.5)
 }
 \description{
 Compute BIC

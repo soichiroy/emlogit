@@ -127,7 +127,9 @@ al_log_likelihood <- function(y, X, trials, betas) {
 
 #' Compute BIC
 #' @keywords internal
-al_compute_BIC <- function(y, X, trials, betas, p_vec, thres = 1e-4) {
+al_compute_BIC <- function(y, X, trials, betas, p_vec, thres = 1e-4,
+    EBIC = TRUE, gm = 0.5
+) {
   betas[abs(betas) <= thres] <- 0
   np   <- length(p_vec)
   nobs <- length(y)
@@ -136,6 +138,12 @@ al_compute_BIC <- function(y, X, trials, betas, p_vec, thres = 1e-4) {
   df <- sum(betas != 0) - (np - 1)
 
   ## BIC = df * log(n) - 2 * LL
-  BIC <- log(nobs) * df - 2 * al_log_likelihood(y, X, trials, betas)
+  if (isTRUE(EBIC)) {
+    penalty <- log(nobs) * df + 2 * df * gm * log(length(betas))
+  } else {
+    penalty <- log(nobs) * df  
+  }
+  
+  BIC <- - 2 * al_log_likelihood(y, X, trials, betas) + penalty
   return(BIC)
 }

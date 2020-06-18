@@ -120,7 +120,7 @@ cbsw_update_beta <- function() {
 }
 
 
-softThreshld <- function(x, lambda) {
+softThreshold <- function(x, lambda) {
   return(sign(x) * pmax(abs(x) - lambda, 0))
 }
 
@@ -130,10 +130,10 @@ softThreshld <- function(x, lambda) {
 #' @keywords internal
 cbsw_update_eta <- function(params, A, lambda) {
   ## form y 
-  y <- as.vector(A %*% params$beta  + params$w)
+  y <- as.vector(A %*% params$beta + params$w)
   
   ## update eta by soft-thresholding 
-  eta <- softThreshld(y, lambda)
+  eta <- softThreshold(y, lambda)
   return(eta)
 }
 
