@@ -6,8 +6,6 @@ require(labelled)
 require(haven)
 data(cces_survey)
 
-
-
 nc_sample <- cces_survey %>%
   filter(st == "NC") %>%
   na.omit()
@@ -25,11 +23,15 @@ ct <- create_input_matrix(as.list(xx$pvec))
 pm <- cbsw_prepare_params(ct)
 
 
-ct$lambda  <- 1
-ct$rho     <- 1/2
-fit <- cbsw_admm(pm, xx, ct, option = list(max_iter = 50, tol = 1e-5,
+ct$lambda  <- 0.5
+ct$rho     <- 1
+
+debugonce(cbsw_admm)
+debugonce(cbsw_update_beta)
+fit <- cbsw_admm(pm, xx, ct, option = list(max_iter = 10, tol = 1e-5,
   use_grad = FALSE))
 
+pm$beta <- fit$beta
 
 y <- ct$B %*% pm$eta + pm$w
 Ab <- ct$A %*% pm$beta
@@ -43,7 +45,7 @@ cbsw_main_objective_fn(
   par = pm$beta, S = xx$y, X = xx$X, params = pm,
   A = ct$A, B = ct$B, rho = ct$rho)
 
-
-ct$A %*% pm$beta +
-ct$B %*% pm$eta +
-pm$w
+debugonce(cbsw_main_objective_gr)
+cbsw_main_objective_gr(
+  par = pm$beta, S = xx$y, X = xx$X, params = pm,
+  A = ct$A, B = ct$B, rho = ct$rho)

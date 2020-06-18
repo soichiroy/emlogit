@@ -102,8 +102,6 @@ cbsw_prepare_params <- function(obj) {
 
 
 cbsw_admm <- function(params, data, const, option) {
-
-
   diff_obj <- 1
   for (iter in 1:option$max_iter) {
 
@@ -139,7 +137,7 @@ cbsw_update_beta <- function(params, data, const, option) {
                )
   } else {
     fit <- optim(par = params$beta, fn = cbsw_main_objective_fn,
-                 S = data$S, X = data$X, params = params,
+                 S = data$y, X = data$X, params = params,
                  A = const$A, B = const$B, rho = const$rho,
                  method = "BFGS"
                )
@@ -152,11 +150,13 @@ cbsw_update_beta <- function(params, data, const, option) {
 cbsw_main_objective_fn <- function(par, S, X, params, A, B, rho) {
   ## Objective
   ##
-  ##    S * exp(X'β) + (1 - S) * X'β + ρ/2 * (β'A'Aβ + 2y'Aβ)
+  ##    S * exp(-X'β) + (1 - S) * X'β + ρ/2 * (β'A'Aβ + 2y'Aβ)
   ##
   ## where y = Bη + w
   ##
-
+  
+  n0 <- sum(S == 0)
+  
   ## construct y
   y <- B %*% params$eta + params$w
 
@@ -167,14 +167,18 @@ cbsw_main_objective_fn <- function(par, S, X, params, A, B, rho) {
   Xb <- X %*% par
 
   ## evaluate the objective
-  obj_main <- sum((-1) * S * exp(-Xb) -  (1 - S) * Xb)
+  obj_main <- sum(S * exp(-Xb) +  (1 - S) * Xb) / n0
   obj_pen  <- as.vector(rho/2 * (t(Ab) %*% Ab + 2 * t(y) %*% Ab))
-
-  return(obj_main + obj_pen)
+  obj <- obj_main + obj_pen
+  return(obj)
 }
 
 
 cbsw_main_objective_gr <- function(par, S, X, params, A, B, rho) {
+  
+  ## 
+  n0 <- sum(S == 0)
+  
   ## compute y
   y <- B %*% params$eta + params$w
 
@@ -188,10 +192,10 @@ cbsw_main_objective_gr <- function(par, S, X, params, A, B, rho) {
   X1b <- X1 %*% par
 
   ## compute gradient
-  gr1 <- t(X1) %*% exp(X1b)
-  gr0 <- -colSums(X0)
-  grp <- rho * AA %*% par + rho * t(y) %*% A
-  gr  <- gr1 + gr0 + grp
+  gr1 <- as.vector(t(X1) %*% exp(-X1b)) 
+  gr0 <- as.vector(colSums(X0))
+  grp <- as.vector(rho * par %*% AA + rho * t(y) %*% A)
+  gr  <- (gr0 - gr1) / n0 + grp
   return(gr)
 }
 
