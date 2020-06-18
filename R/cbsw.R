@@ -11,7 +11,7 @@ CBSW <- function(formula, data, option) {
 
 
   ## prepare inputs
-  data <- al_data(format, data)
+  data <- al_data(formula, data)
 
   ## create constraints
   const <- create_input_matrix(as.list(data$pvec))
@@ -22,6 +22,41 @@ CBSW <- function(formula, data, option) {
   ## optimization
   params <- cbsw_admm(params, data, const, option)
 }
+
+
+#' Covariate Balancing Survey Weights for Categorical Variables with CV
+#' @import future 
+#' @importFrom furrr future_map future_options
+#' @export
+cvCBSW <- function(formula, data, option) {
+
+
+  ## prepare inputs
+  data <- al_data(formula, data)
+
+  ## create constraints
+  const <- create_input_matrix(as.list(data$pvec))
+
+  ## initialize parameters
+  params <- cbsw_prepare_params(const)
+
+  ## prepare lambda sequence 
+  lambda_vec <- exp(seq(-1, 1, by = 0.1))
+  
+  ## optimization
+  plan(multiprocess)
+  fit <- future_map(lambda_vec, function(ll) {
+    const$lambda <- ll 
+    const$rho    <- 1
+    params <- cbsw_admm(params, data, const, 
+    option = list(max_iter = 30, tol = 1e-5, use_grad = TRUE))
+    return(params)
+  }, .options = future_options(seed = TRUE))
+  
+  return(fit)
+    
+}
+
 
 
 #' Create Matrix Inputs
@@ -130,8 +165,8 @@ cbsw_admm <- function(params, data, const, option) {
 cbsw_update_beta <- function(params, data, const, option) {
 
   if (isTRUE(option$use_grad)) {
-    fit <- optim(par = params$beta, fn = cbsw_main_objective_fn,
-                 gr = cbsw_main_objective_gr,
+    fit <- optim(par = params$beta, 
+                 fn = cbsw_main_objective_fn, gr = cbsw_main_objective_gr,
                  S = data$y, X = data$X, n0 = data$n0,
                  params = params,
                  A = const$A, B = const$B, rho = const$rho,
