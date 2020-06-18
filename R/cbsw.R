@@ -25,7 +25,7 @@ CBSW <- function(formula, data, option) {
 
 
 #' Covariate Balancing Survey Weights for Categorical Variables with CV
-#' @import future 
+#' @import future
 #' @importFrom furrr future_map future_options
 #' @export
 cvCBSW <- function(formula, data, option) {
@@ -40,21 +40,21 @@ cvCBSW <- function(formula, data, option) {
   ## initialize parameters
   params <- cbsw_prepare_params(const)
 
-  ## prepare lambda sequence 
+  ## prepare lambda sequence
   lambda_vec <- exp(seq(-1, 1, by = 0.1))
-  
+
   ## optimization
   plan(multiprocess)
   fit <- future_map(lambda_vec, function(ll) {
-    const$lambda <- ll 
+    const$lambda <- ll
     const$rho    <- 1
-    params <- cbsw_admm(params, data, const, 
+    params <- cbsw_admm(params, data, const,
     option = list(max_iter = 30, tol = 1e-5, use_grad = TRUE))
     return(params)
   }, .options = future_options(seed = TRUE))
-  
+
   return(fit)
-    
+
 }
 
 
@@ -165,7 +165,7 @@ cbsw_admm <- function(params, data, const, option) {
 cbsw_update_beta <- function(params, data, const, option) {
 
   if (isTRUE(option$use_grad)) {
-    fit <- optim(par = params$beta, 
+    fit <- optim(par = params$beta,
                  fn = cbsw_main_objective_fn, gr = cbsw_main_objective_gr,
                  S = data$y, X = data$X, n0 = data$n0,
                  params = params,
@@ -193,7 +193,7 @@ cbsw_main_objective_fn <- function(par, S, X, n0, params, A, B, rho) {
   ##
   ## where y = Bη + w
   ##
-  
+
   ## construct y
   y <- B %*% params$eta + params$w
 
@@ -212,7 +212,7 @@ cbsw_main_objective_fn <- function(par, S, X, n0, params, A, B, rho) {
 
 
 cbsw_main_objective_gr <- function(par, S, X, n0, params, A, B, rho) {
-  
+
   ## compute y
   y <- B %*% params$eta + params$w
 
@@ -226,7 +226,7 @@ cbsw_main_objective_gr <- function(par, S, X, n0, params, A, B, rho) {
   X1b <- X1 %*% par
 
   ## compute gradient
-  gr1 <- as.vector(t(X1) %*% exp(-X1b)) 
+  gr1 <- as.vector(t(X1) %*% exp(-X1b))
   gr0 <- as.vector(colSums(X0))
   grp <- as.vector(rho * par %*% AA + rho * t(y) %*% A)
   gr  <- (gr0 - gr1) / n0 + grp
@@ -262,6 +262,6 @@ cbsw_update_eta <- function(params, const) {
 #' @param B B matrix in the constraint: Aβ + Bη = c.
 #' @keywords internal
 cbsw_update_w <- function(params, const) {
-    w <- const$A %*% params$beta + const$B %*% params$eta + params$w
-    return(w)
+  w <- const$A %*% params$beta + const$B %*% params$eta + params$w
+  return(w)
 }
