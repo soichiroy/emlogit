@@ -68,10 +68,11 @@ create_input_matrix <- function(Lk_list) {
   ## B = | 0 |
   ##     | I |
   Bk <- list()
+  Bk[[1]] <- Matrix(0, nrow = 1, ncol = 1)
   for (k in 2:length(Lk_list)) {
     Lk <- Lk_list[[k]]
     zeros_Lk  <- Matrix(0, nrow = 1, ncol = dvec[[k-1]])
-    Bk[[k-1]] <- rbind(zeros_Lk, -Diagonal(dvec[[k-1]]))
+    Bk[[k]] <- rbind(zeros_Lk, -Diagonal(dvec[[k-1]]))
   }
 
   Bmat <- bdiag(Bk)
@@ -93,13 +94,17 @@ cbsw_prepare_params <- function(obj) {
   ## Prepare η for g(η)
   eta_param  <- rnorm(ncol(obj$B))
 
+  ## Prepare w
+  w_param <- rnorm(nrow(obj$A))
 
-  return(list(beta = beta_param, eta = eta_param))
+  return(list(beta = beta_param, eta = eta_param, w = w_param))
 }
 
 
 cbsw_admm <- function(params, data, const, option) {
 
+
+  diff_obj <- 1
   for (iter in 1:option$max_iter) {
 
     ## update β
@@ -162,8 +167,8 @@ cbsw_main_objective_fn <- function(par, S, X, params, A, B, rho) {
   Xb <- X %*% par
 
   ## evaluate the objective
-  obj_main <- sum(S * exp(Xb) + (1 - S) * Xb)
-  obj_pen  <- rho/2 * (t(Ab) %*% Ab + 2 * y %*% Ab)
+  obj_main <- sum((-1) * S * exp(-Xb) -  (1 - S) * Xb)
+  obj_pen  <- as.vector(rho/2 * (t(Ab) %*% Ab + 2 * t(y) %*% Ab))
 
   return(obj_main + obj_pen)
 }
@@ -184,7 +189,7 @@ cbsw_main_objective_gr <- function(par, S, X, params, A, B, rho) {
 
   ## compute gradient
   gr1 <- t(X1) %*% exp(X1b)
-  gr0 <- colSums(X0)
+  gr0 <- -colSums(X0)
   grp <- rho * AA %*% par + rho * t(y) %*% A
   gr  <- gr1 + gr0 + grp
   return(gr)
@@ -207,7 +212,7 @@ cbsw_update_eta <- function(params, const) {
   y <- as.vector(const$A %*% params$beta  + params$w)
 
   ## update eta by soft-thresholding
-  eta <- softThreshld(y, const$lambda)
+  eta <- softThreshld(t(const$B) %*% y, const$lambda)
   return(eta)
 }
 
