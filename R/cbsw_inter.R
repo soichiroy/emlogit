@@ -17,9 +17,6 @@ cbsw_interaction <- function() {
 
 
 
-
-
-
 cbsw_inter_update_eta <- function(const_obj, data_obj, params, controls) {
   
   fit <- optim(par      = params$eta, 
@@ -46,8 +43,7 @@ cbsw_inter_loss <- function(par, Xmat, x_pop, Mmat, constMat, uvec, phi, rho) {
   
   ## regularization component 
   q2 <- par %*% Mmat %*% par * rho / 2
-  q0 <- rho * t(uvec[[1]]) %*% constMat[[1]] %*% par
-  q1 <- rowSums(sapply(2:length(uvec), function(i) {
+  q1 <- rowSums(sapply(1:length(uvec), function(i) {
                         unew <- uvec[[i]] - phi[[i]]
                         as.vector(t(unew) %*% constMat[[i]]) 
                       })) %*% par * rho 
@@ -58,14 +54,13 @@ cbsw_inter_loss <- function(par, Xmat, x_pop, Mmat, constMat, uvec, phi, rho) {
 #' Compute gradient of the loss function 
 #' @keywords internal
 cbsw_inter_loss_gradient <- function(par, Xmat, x_pop, Mmat, constMat, uvec, phi, rho) {
-  m0 <- t(uvec[[1]] )%*% constMat[[1]]
-  m <- rowSums(sapply(2:length(uvec), function(i) {
+  m <- rowSums(sapply(1:length(uvec), function(i) {
                         unew <- uvec[[i]] - phi[[i]]
                         as.vector(t(unew) %*% constMat[[i]]) 
                       }))
   expXb <- exp(Xmat %*% par)
   main <- t(expXb) %*% Xmat / sum(expXb)
-  grad <- (main - x_pop) + rho * (par %*% Mmat + m + m0)
+  grad <- (main - x_pop) + rho * (par %*% Mmat + m)
   return(as.vector(grad))
 }
 
@@ -77,6 +72,9 @@ cbsw_inter_update_phi <- function(eta, constMat, uvec, w = 1) {
   
   ## update phi 
   phi_new <- map(tmp, ~ as.vector(gSoftThreshold(.x, w)))
+
+  ## first const is sum-to-zero: no phi is defined 
+  phi_new[[1]] <- rep(0, length(phi_new[[1]]))
   
   return(phi_new)
 }
@@ -120,12 +118,17 @@ cbsw_inter_input <- function(level_main, level_inter) {
     tmp_graph <- igraph::graph_from_adjacency_matrix(Adj, mode = 'undirected', diag = FALSE)
     Dk[[i]]   <- genlasso::getDgSparse(tmp_graph)    
     
-    
+    ## prepare total difference matrix 
+    ## add main term diff's 
     Di[[i]]   <- list()
     sparse_tmp <- rep(list(sparse_zeros), nrow(Dk[[i]]))
     for (j in 1:nrow(Dk[[i]])) {
       sparse_tmp[[j]][[i]] <- Dk[[i]][j, , drop = FALSE]
-      Di[[i]][[j]] <- bdiag(sparse_tmp[[j]])
+      ## create block-diagonal with empty rows 
+      ## to make cols to be total number of parameters
+      Di_block <- bdiag(sparse_tmp[[j]])
+      ## remove empty rows 
+      Di[[i]][[j]] <- Di_block[unique(Di_block@i)+1, , drop = FALSE]
     }
   }
 
@@ -141,7 +144,6 @@ cbsw_inter_input <- function(level_main, level_inter) {
   
   
   Di[[1]] <- list(append(sparse_ones, sparse_ones_inter))
-  
   
   ## interaction terms 
   for (i in 1:length(level_inter)) {
@@ -184,6 +186,9 @@ cbsw_inter_input <- function(level_main, level_inter) {
   ## combine Di 
   constMat <- unlist(purrr::map(1:length(Di), function(i) purrr::map(Di[[i]], ~bdiag(.x))))
   
+  ## adjust the intercept in the zero-sum const 
+  constMat[[1]] <- constMat[[1]][-1, ]
+  
   return(constMat)
 }
 
@@ -194,7 +199,7 @@ cbsw_inter_input <- function(level_main, level_inter) {
 
 cbsw_inter_update_u <- function(eta, phi, uvec, constMat) {
   unew <- lapply(1:length(uvec), function(i) {
-      constMat[[i]] %*% eta - phi[[i]]
+      uvec[[i]] + (constMat[[i]] %*% eta - phi[[i]])
   })
   return(unew)
 }
