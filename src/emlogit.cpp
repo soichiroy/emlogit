@@ -13,7 +13,7 @@
 // log-sum-exp for a arma::rowvec input
 // @param in_vec A reference pass of arma::rowvec.
 // @returns A double of log(sum(exp(in_vec))).
-double lse_rv (
+inline double lse_rv (
   const arma::rowvec &in_vec
 ) {
   double a_max = arma::max(in_vec);
@@ -33,7 +33,7 @@ arma::vec log_sum_exp_beta(const arma::mat &XB) {
 }
 
 
-arma::vec sum_exp_beta(const arma::mat &XB) {
+inline arma::vec sum_exp_beta(const arma::mat &XB) {
 
   // compute the common term
   arma::vec denom = arma::sum(exp(XB), 1);
