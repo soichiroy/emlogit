@@ -105,26 +105,42 @@ constMat    <- cbsw_inter_input(level_main, level_inter)
 Mmat        <- Reduce("+", purrr::map(constMat, ~t(.x) %*% .x))
 uvec        <- map(constMat, ~runif(nrow(.x)));
 phi         <- cbsw_inter_update_phi(par_init, constMat, uvec)
+
+
 cbsw_inter_loss(
   par = par_init, 
   Xmat = cbind(rep(1, nrow(X)), X), 
   x_pop = c(1, pop_vector), 
   Mmat, constMat, uvec, phi, rho = 1)
 
-cbsw_inter_loss_gradient(
+cbsw_inter_loss_cpp(
+  par = par_init, 
+  Xmat = cbind(rep(1, nrow(X)), X), 
+  pop_vec = c(1, pop_vector), 
+  Mmat, constMat, uvec, phi, rho = 1)
+
+
+gr <- cbsw_inter_loss_gradient(
     par = par_init, 
     Xmat = cbind(rep(1, nrow(X)), X), 
     x_pop = c(1, pop_vector), 
     Mmat, constMat, uvec, phi, rho = 1
 )
 
+gr_cpp <- cbsw_inter_loss_gradient_cpp(
+    par = par_init, 
+    Xmat = cbind(rep(1, nrow(X)), X), 
+    pop_vec = c(1, pop_vector), 
+    Mmat, constMat, uvec, phi, rho = 1
+)
+
 
 fit_test <- optim(
   par = runif(length(par_init)), 
-  fn  = cbsw_inter_loss,
-  gr  = cbsw_inter_loss_gradient,
+  fn  = cbsw_inter_loss_cpp,
+  gr  = cbsw_inter_loss_gradient_cpp,
   Xmat = cbind(rep(1, nrow(X)), X), 
-  x_pop = c(1, pop_vector), 
+  pop_vec = c(1, pop_vector), 
   Mmat  = Mmat, 
   constMat = constMat, 
   uvec = uvec, phi = phi, rho = 1,
@@ -147,10 +163,10 @@ for (i in 1:50) {
   cat("currently at ", i, "\n")
   phi_old <- phi 
   fit <- lbfgs(
-    cbsw_inter_loss, cbsw_inter_loss_gradient,
+    cbsw_inter_loss_cpp, cbsw_inter_loss_gradient_cpp,
     vars = eta,
     Xmat = cbind(rep(1, nrow(X)), X), 
-    x_pop = c(1, pop_vector), 
+    pop_vec = c(1, pop_vector), 
     Mmat  = Mmat, 
     constMat = constMat, 
     uvec = uvec, phi = phi, rho = 1,
@@ -181,3 +197,9 @@ for (i in 1:50) {
 par(mfrow = c(1, 2))
 plot(pr_resid, type = 'l')
 plot(du_resid, type = 'l')
+
+
+
+ebal_fit <- ebal_survey(X, pop_vector, add_intercept = TRUE)
+
+enframe(apply(X, 2, weighted.mean, w = ebal_fit$w))
