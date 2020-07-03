@@ -1,6 +1,6 @@
 
 
-## load data 
+## load data
 require(tidyverse)
 require(haven)
 require(labelled)
@@ -10,30 +10,30 @@ data(acs2017TX_race)
 data(cces2018TX)
 
 
-cces2018TX <- cces2018TX %>% 
+cces2018TX <- cces2018TX %>%
   filter(citizen == 1)
 
-## 
-## compute CD level targets 
-## 
+##
+## compute CD level targets
+##
 compute_prop <- function(dat, var_name) {
-  summary_dat <- dat %>% 
-    group_by_at(vars(one_of(var_name))) %>% 
-    summarise(n = sum(count)) %>% 
-    ungroup() %>% 
-    mutate(prop = n / sum(n))  %>% 
-    select(-n) 
+  summary_dat <- dat %>%
+    group_by_at(vars(one_of(var_name))) %>%
+    summarise(n = sum(count)) %>%
+    ungroup() %>%
+    mutate(prop = n / sum(n))  %>%
+    select(-n)
   return(summary_dat)
 }
 
-## main terms 
+## main terms
 pop_cd     <- compute_prop(acs2017TX_educ, c("cd"))
 pop_educ   <- compute_prop(acs2017TX_educ, c("educ"))
 pop_age    <- compute_prop(acs2017TX_educ, c("age"))
 pop_gender <- compute_prop(acs2017TX_educ, c("gender"))
 pop_race   <- compute_prop(acs2017TX_race, c("race"))
 
-## interaction by cd 
+## interaction by cd
 pop_cd_educ   <- compute_prop(acs2017TX_educ, c("cd", "educ"))
 pop_cd_age    <- compute_prop(acs2017TX_educ, c("cd", "age"))
 pop_cd_gender <- compute_prop(acs2017TX_educ, c("cd", "gender"))
@@ -41,57 +41,57 @@ pop_cd_race   <- compute_prop(acs2017TX_race, c("cd", "race"))
 
 
 ##
-## create survey matrix 
-## 
+## create survey matrix
+##
 cd_mat <- model.matrix(~ cd - 1, data = cces2018TX)
-  
-gender_mat <- cces2018TX %>% 
-  mutate(gender = to_factor(gender)) %>% 
+
+gender_mat <- cces2018TX %>%
+  mutate(gender = to_factor(gender)) %>%
   model.matrix(~ gender - 1, data = .)
 # gender_mat <- gender_mat[, 'genderMale', drop = FALSE]
 
-race_mat <- cces2018TX %>% 
-  mutate(race = to_factor(race)) %>% 
+race_mat <- cces2018TX %>%
+  mutate(race = to_factor(race)) %>%
   model.matrix(~ race - 1, data = .)
 # race_mat[,"raceAll Other"] <- race_mat[,"raceAll Other"] + race_mat[,"raceAsian"]
 # race_mat <- race_mat[, c("raceWhite", "raceBlack", "raceHispanic")]
 
-age_mat <- cces2018TX %>% 
-  mutate(age = to_factor(age)) %>% 
+age_mat <- cces2018TX %>%
+  mutate(age = to_factor(age)) %>%
   model.matrix(~ age - 1, data = .)
 # age_mat <- age_mat[,-ncol(age_mat)]
-educ_mat <- cces2018TX %>% 
-  mutate(educ = to_factor(educ)) %>% 
+educ_mat <- cces2018TX %>%
+  mutate(educ = to_factor(educ)) %>%
   model.matrix(~ educ - 1, data = .)
 # educ_mat <- educ_mat[,-ncol(educ_mat)]
 
 
 
-cd_gender <- cces2018TX %>% 
-  mutate(gender = to_factor(gender)) %>% 
+cd_gender <- cces2018TX %>%
+  mutate(gender = to_factor(gender)) %>%
   model.matrix(~ cd:gender - 1, data = .)
-cd_race <- cces2018TX %>% 
-  mutate(race = to_factor(race)) %>% 
+cd_race <- cces2018TX %>%
+  mutate(race = to_factor(race)) %>%
   model.matrix(~ cd:race - 1, data = .)
-cd_age <- cces2018TX %>% 
-  mutate(age = to_factor(age)) %>% 
+cd_age <- cces2018TX %>%
+  mutate(age = to_factor(age)) %>%
   model.matrix(~ cd:age - 1, data = .)
-cd_educ <- cces2018TX %>% 
-  mutate(educ = to_factor(educ)) %>% 
+cd_educ <- cces2018TX %>%
+  mutate(educ = to_factor(educ)) %>%
   model.matrix(~ cd:educ - 1, data = .)
 
 apply(cd_race, 2, mean)
 
 
 pop_vector <- c(
-  pop_cd$prop, 
-  pop_educ$prop, 
+  pop_cd$prop,
+  pop_educ$prop,
   pop_cd_educ$prop
 )
 
 X <- cbind(
-  cd_mat, 
-  educ_mat, 
+  cd_mat,
+  educ_mat,
   cd_educ
 )
 
@@ -108,9 +108,9 @@ phi         <- cbsw_inter_update_phi(par_init, constMat, uvec)
 
 
 cbsw_inter_loss(
-  par = par_init, 
-  Xmat = cbind(rep(1, nrow(X)), X), 
-  x_pop = c(1, pop_vector), 
+  par = par_init,
+  Xmat = cbind(rep(1, nrow(X)), X),
+  x_pop = c(1, pop_vector),
   Mmat, constMat, uvec, phi, rho = 1)
 
 cbsw_inter_loss_cpp(
@@ -161,7 +161,7 @@ eta <- rnorm(length(par_init))
 loss_trace <- pr_resid <- du_resid <- rep(NA, 20)
 for (i in 1:50) {
   cat("currently at ", i, "\n")
-  phi_old <- phi 
+  phi_old <- phi
   fit <- lbfgs(
     cbsw_inter_loss_cpp, cbsw_inter_loss_gradient_cpp,
     vars = eta,
@@ -172,21 +172,21 @@ for (i in 1:50) {
     uvec = uvec, phi = phi, rho = 1,
     invisible = 1
   )
-  
-  eta <- fit$par 
+
+  eta <- fit$par
   loss_trace[i] <- fit$value
 
   phi <- cbsw_inter_update_phi(
-    eta, constMat, uvec, w = 0.2
+    eta, constMat, uvec, w = 0.0
   )
 
-  uvec <- cbsw_inter_update_u(eta, phi, uvec, constMat) 
-  
-  ## comptue primal residual 
+  uvec <- cbsw_inter_update_u(eta, phi, uvec, constMat)
+
+  ## comptue primal residual
   pr_resid[i] <- sum(future_sapply(1:length(constMat), function(i) {
     norm2(constMat[[i]] %*% eta - phi[[i]])
   }))
-  
+
   ## compute dual residual
   du_resid[i] <- sum(future_sapply(1:length(constMat), function(i) {
     norm2(t(constMat[[i]]) %*% (phi[[i]] - phi_old[[i]]))
@@ -195,7 +195,7 @@ for (i in 1:50) {
 
 
 par(mfrow = c(1, 2))
-plot(pr_resid, type = 'l')
+plot(pr_resid, type = 'l', log = 'y')
 plot(du_resid, type = 'l')
 
 
