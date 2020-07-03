@@ -25,7 +25,7 @@ cbsw_inter_update_eta <- function(const_obj, data_obj, params, controls) {
                x_pop    = data_obj$population,
                Mmat     = const_obj$M, 
                constMat = const_obj$constMat, 
-               uvec     = params$uvec 
+               uvec     = params$uvec,
                phi      = params$phi,
                rho      = constrols$rho,
                method   = "BFGS"
@@ -199,7 +199,7 @@ cbsw_inter_input <- function(level_main, level_inter) {
 
 cbsw_inter_update_u <- function(eta, phi, uvec, constMat) {
   unew <- lapply(1:length(uvec), function(i) {
-      uvec[[i]] + (constMat[[i]] %*% eta - phi[[i]])
+      uvec[[i]] + as.vector(constMat[[i]] %*% eta - phi[[i]])
   })
   return(unew)
 }
