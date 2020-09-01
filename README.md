@@ -7,6 +7,8 @@
 
 [![Build
 Status](https://travis-ci.com/soichiroy/emlogit.svg?branch=master)](https://travis-ci.com/soichiroy/emlogit)
+[![R build
+status](https://github.com/soichiroy/emlogit/workflows/R-CMD-check/badge.svg)](https://github.com/soichiroy/emlogit/actions)
 <!-- badges: end -->
 
 `emlogit` is a **R** package that implements the Expectation and
