@@ -16,8 +16,8 @@ jobs:
         run: |
           install.packages("remotes")
           remotes::install_local(".")
-          remotes::install_cran(c("rmarkdown", "tidyverse", "knitr"))
-          remotes::install_github("soichiroy/dyRank", dependencies = TRUE)
+          remotes::install_cran(c("rmarkdown", "tidyverse", "knitr", "mlogit", "MNP"))
+          remotes::install_github("soichiroy/emlogit", dependencies = TRUE)
         shell: Rscript {0}
       - name: Render README
         run: Rscript -e 'rmarkdown::render("README.Rmd")'
