@@ -6,8 +6,9 @@
 #' @export
 print.summary.emlogit <- function(obj) {
   # print(obj)
-  print_tbl <- getFromNamespace("print.tbl", "tibble")
-  print_tbl(obj)
+  # print_tbl <- getFromNamespace("print.tbl", "tibble")
+  # print_tbl(obj)
+  print(as.data.frame(obj), digits = 2)
   invisible(obj)
 }
 
@@ -66,7 +67,7 @@ summary.emlogit <- function(obj) {
 
 
 #' Obtain the predicted probability
-#' @param obj An output of \code{emlogit()} funcion. 
+#' @param obj An output of \code{emlogit()} funcion.
 #' @param newdata A matrix of newdata. If not provided, the insample fit is returned.
 #' @export
 predict.emlogit <- function(obj, newdata = NULL) {
