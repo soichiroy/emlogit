@@ -51,29 +51,27 @@ X <- Car %>% select(college, hsg2, coml5) %>% data.matrix()
 ## fit
 fit <- emlogit(Y = Y, X = X)
 summary(fit)
-#> [90m# A tibble: 20 x 4[39m
-#>    category      betas     estimate     se
-#>    [3m[90m<chr>[39m[23m         [3m[90m<chr>[39m[23m        [3m[90m<dbl>[39m[23m  [3m[90m<dbl>[39m[23m
-#> [90m 1[39m choicechoice2 intercept -[31m1[39m[31m.[39m[31m10[39m    0.148 
-#> [90m 2[39m choicechoice2 college   -[31m0[39m[31m.[39m[31m132[39m   0.149 
-#> [90m 3[39m choicechoice2 hsg2       0.452   0.139 
-#> [90m 4[39m choicechoice2 coml5     -[31m0[39m[31m.[39m[31m311[39m   0.138 
-#> [90m 5[39m choicechoice3 intercept  0.478   0.077[4m9[24m
-#> [90m 6[39m choicechoice3 college   -[31m0[39m[31m.[39m[31m00[39m[31m2[4m8[24m[4m1[24m[39m 0.078[4m8[24m
-#> [90m 7[39m choicechoice3 hsg2      -[31m0[39m[31m.[39m[31m0[39m[31m96[4m1[24m[39m  0.080[4m7[24m
-#> [90m 8[39m choicechoice3 coml5     -[31m0[39m[31m.[39m[31m114[39m   0.068[4m4[24m
-#> [90m 9[39m choicechoice4 intercept -[31m0[39m[31m.[39m[31m915[39m   0.132 
-#> [90m10[39m choicechoice4 college   -[31m0[39m[31m.[39m[31m140[39m   0.131 
-#> [90m11[39m choicechoice4 hsg2       0.569   0.121 
-#> [90m12[39m choicechoice4 coml5     -[31m0[39m[31m.[39m[31m166[39m   0.120 
-#> [90m13[39m choicechoice5 intercept  0.624   0.073[4m9[24m
-#> [90m14[39m choicechoice5 college   -[31m0[39m[31m.[39m[31m161[39m   0.074[4m3[24m
-#> [90m15[39m choicechoice5 hsg2      -[31m0[39m[31m.[39m[31m0[39m[31m45[4m8[24m[39m  0.077[4m4[24m
-#> [90m16[39m choicechoice5 coml5      0.093[4m2[24m  0.065[4m3[24m
-#> [90m17[39m choicechoice6 intercept -[31m0[39m[31m.[39m[31m901[39m   0.132 
-#> [90m18[39m choicechoice6 college   -[31m0[39m[31m.[39m[31m393[39m   0.132 
-#> [90m19[39m choicechoice6 hsg2       0.513   0.130 
-#> [90m20[39m choicechoice6 coml5     -[31m0[39m[31m.[39m[31m00[39m[31m9[4m8[24m[4m3[24m[39m 0.124
+#>         category     betas estimate    se
+#> 1  choicechoice2 intercept  -1.1007 0.148
+#> 2  choicechoice2   college  -0.1320 0.149
+#> 3  choicechoice2      hsg2   0.4519 0.139
+#> 4  choicechoice2     coml5  -0.3114 0.138
+#> 5  choicechoice3 intercept   0.4781 0.078
+#> 6  choicechoice3   college  -0.0028 0.079
+#> 7  choicechoice3      hsg2  -0.0961 0.081
+#> 8  choicechoice3     coml5  -0.1136 0.068
+#> 9  choicechoice4 intercept  -0.9154 0.132
+#> 10 choicechoice4   college  -0.1400 0.131
+#> 11 choicechoice4      hsg2   0.5685 0.121
+#> 12 choicechoice4     coml5  -0.1660 0.120
+#> 13 choicechoice5 intercept   0.6237 0.074
+#> 14 choicechoice5   college  -0.1612 0.074
+#> 15 choicechoice5      hsg2  -0.0458 0.077
+#> 16 choicechoice5     coml5   0.0932 0.065
+#> 17 choicechoice6 intercept  -0.9013 0.132
+#> 18 choicechoice6   college  -0.3928 0.132
+#> 19 choicechoice6      hsg2   0.5126 0.130
+#> 20 choicechoice6     coml5  -0.0098 0.124
 
 ## predicted probability
 prob <- predict(fit)
@@ -116,21 +114,19 @@ X <- japan %>% select(gender, education, age) %>% data.matrix()
 set.seed(1234)
 fit <- emlogit(Y = Y, X = X)
 summary(fit)
-#> [90m# A tibble: 12 x 4[39m
-#>    category betas     estimate      se
-#>    [3m[90m<chr>[39m[23m    [3m[90m<chr>[39m[23m        [3m[90m<dbl>[39m[23m   [3m[90m<dbl>[39m[23m
-#> [90m 1[39m JCP      intercept -[31m0[39m[31m.[39m[31m600[39m   0.974  
-#> [90m 2[39m JCP      gender     0.077[4m7[24m  0.316  
-#> [90m 3[39m JCP      education  0.031[4m4[24m  0.162  
-#> [90m 4[39m JCP      age       -[31m0[39m[31m.[39m[31m00[39m[31m8[4m2[24m[4m3[24m[39m 0.012[4m9[24m 
-#> [90m 5[39m NFP      intercept  0.564   0.698  
-#> [90m 6[39m NFP      gender    -[31m0[39m[31m.[39m[31m165[39m   0.228  
-#> [90m 7[39m NFP      education -[31m0[39m[31m.[39m[31m0[39m[31m19[4m8[24m[39m  0.122  
-#> [90m 8[39m NFP      age       -[31m0[39m[31m.[39m[31m00[39m[31m5[4m6[24m[4m7[24m[39m 0.009[4m4[24m[4m3[24m
-#> [90m 9[39m SKG      intercept -[31m0[39m[31m.[39m[31m214[39m   0.766  
-#> [90m10[39m SKG      gender    -[31m0[39m[31m.[39m[31m0[39m[31m71[4m0[24m[39m  0.249  
-#> [90m11[39m SKG      education  0.057[4m8[24m  0.130  
-#> [90m12[39m SKG      age       -[31m0[39m[31m.[39m[31m00[39m[31m1[4m8[24m[4m9[24m[39m 0.010[4m3[24m
+#>    category     betas estimate     se
+#> 1       JCP intercept  -0.5997 0.9744
+#> 2       JCP    gender   0.0777 0.3161
+#> 3       JCP education   0.0314 0.1616
+#> 4       JCP       age  -0.0082 0.0129
+#> 5       NFP intercept   0.5641 0.6982
+#> 6       NFP    gender  -0.1651 0.2284
+#> 7       NFP education  -0.0198 0.1220
+#> 8       NFP       age  -0.0057 0.0094
+#> 9       SKG intercept  -0.2141 0.7655
+#> 10      SKG    gender  -0.0710 0.2494
+#> 11      SKG education   0.0578 0.1296
+#> 12      SKG       age  -0.0019 0.0103
 
 pred <- predict(fit)
 ```
