@@ -63,7 +63,7 @@ arma::mat predict_prob(
     exp_vec /= sum(exp_vec);
     return vec = exp_vec;
   };
-  
+
   return XB.each_row( prob_vec );
 }
 
@@ -227,11 +227,11 @@ arma::mat emlogit_run(
   // EM updates
   for (int iter = 0; iter < max_iter; iter++) {
     // E-step -------------------------------------- //
-    // - update omega | X, B 
+    // - update omega | X, B
     emlogit_estep(X, B, ni, omega);
 
     // M-step -------------------------------------- //
-    // - update B | Y, X, omega, prior 
+    // - update B | Y, X, omega, prior
     emlogit_mstep(Y, X, B, ni, omega, mu0, Z0);
 
     // evaluate log-likelihood --------------------- //
@@ -247,20 +247,20 @@ arma::mat emlogit_run(
       convergence = 1;
       break;
     }
-    
+
     // check user interruption -------------------- //
     if (iter % 50 == 0) {
-      Rcpp::checkUserInterrupt();    
+      Rcpp::checkUserInterrupt();
     }
 
 
-  } // end of EM iteration 
+  } // end of EM iteration
 
   // convergece message --------------------------- //
   if (verbose && convergence == 0) {
     Rcpp::Rcout << "EM algorithm did not converge." << std::endl;
   }
-    
+
   return B;
 }
 
@@ -285,24 +285,24 @@ arma::mat emlogit_var(
   // create a score "matrix" (K by J)
   // arma::mat score_mat = arma::zeros(X.n_cols, B.n_cols-1);
   arma::mat var_mat = arma::zeros(X.n_cols, B.n_cols-1);
-  
-  arma::mat XB = X * B;  
+
+  arma::mat XB = X * B;
   arma::vec denom = sum_exp_beta(XB);
   for (int j = 1; j < B.n_cols; j++) {
     arma::vec tmp = exp(XB.col(j)) / denom;
     arma::vec tmp_n = Y.col(j) % (1.0 - tmp);
     arma::vec prior_score = arma::solve(Z0, (mu0 - B.col(j)));
-    
-    // compute the hessian 
+
+    // compute the hessian
     arma::mat H = -X.t() * arma::diagmat((1.0 - tmp) % tmp) * X + arma::inv(Z0);
 
     if (robust) {
       // --- robust version --- //
       arma::mat SS = X.t() * arma::diagmat(arma::pow(tmp_n, 2)) * X + prior_score * prior_score.t();
-      var_mat.col(j-1) = arma::diagvec( arma::solve(H, SS) * arma::inv(H) );      
+      var_mat.col(j-1) = arma::diagvec( arma::solve(H, SS) * arma::inv(H) );
     } else {
       // --- usual variance based on the Fisher information matrix --- //
-      var_mat.col(j-1) = -arma::diagvec( arma::inv(H) );      
+      var_mat.col(j-1) = -arma::diagvec( arma::inv(H) );
     }
   }
 
