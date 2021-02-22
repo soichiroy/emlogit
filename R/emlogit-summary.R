@@ -17,10 +17,11 @@ print.summary.emlogit <- function(obj) {
 #' @export
 coef.emlogit <- function(object) {
   # Names of the output levels
-  if (is.null(object$y_name))
+  if (is.null(object$y_name)) {
     colnames(object$coef) <- paste("`", 1:ncol(object$coef), "`", sep = "")
-  else
+  } else {
     colnames(object$coef) <- object$y_name
+  }
 
   # Names of the covariates
   if (is.null(object$x_name)) {
