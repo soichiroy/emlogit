@@ -3,3 +3,4 @@
 ^vignettes/emlogit_derivation\.Rmd$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.github$

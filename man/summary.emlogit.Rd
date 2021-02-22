@@ -4,7 +4,7 @@
 \alias{summary.emlogit}
 \title{Summary function}
 \usage{
-summary.emlogit(obj)
+\method{summary}{emlogit}(obj)
 }
 \arguments{
 \item{obj}{An object class of \code{"emlogit.est"}}

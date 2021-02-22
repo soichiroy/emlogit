@@ -5,8 +5,8 @@
 
 <!-- badges: start -->
 
-[![Build
-Status](https://travis-ci.com/soichiroy/emlogit.svg?branch=master)](https://travis-ci.com/soichiroy/emlogit)
+[![R build
+status](https://github.com/soichiroy/emlogit/workflows/R-CMD-check/badge.svg)](https://github.com/soichiroy/emlogit/actions)
 <!-- badges: end -->
 
 `emlogit` is a **R** package that implements the Expectation and
@@ -49,29 +49,27 @@ X <- Car %>% select(college, hsg2, coml5) %>% data.matrix()
 ## fit
 fit <- emlogit(Y = Y, X = X)
 summary(fit)
-#> # A tibble: 20 x 4
-#>    category      betas     estimate     se
-#>    <chr>         <chr>        <dbl>  <dbl>
-#>  1 choicechoice2 intercept -1.10    0.148 
-#>  2 choicechoice2 college   -0.132   0.149 
-#>  3 choicechoice2 hsg2       0.452   0.139 
-#>  4 choicechoice2 coml5     -0.311   0.138 
-#>  5 choicechoice3 intercept  0.478   0.0779
-#>  6 choicechoice3 college   -0.00280 0.0788
-#>  7 choicechoice3 hsg2      -0.0961  0.0807
-#>  8 choicechoice3 coml5     -0.114   0.0684
-#>  9 choicechoice4 intercept -0.915   0.132 
-#> 10 choicechoice4 college   -0.140   0.131 
-#> 11 choicechoice4 hsg2       0.569   0.121 
-#> 12 choicechoice4 coml5     -0.166   0.120 
-#> 13 choicechoice5 intercept  0.624   0.0739
-#> 14 choicechoice5 college   -0.161   0.0743
-#> 15 choicechoice5 hsg2      -0.0458  0.0774
-#> 16 choicechoice5 coml5      0.0932  0.0653
-#> 17 choicechoice6 intercept -0.901   0.132 
-#> 18 choicechoice6 college   -0.393   0.132 
-#> 19 choicechoice6 hsg2       0.513   0.130 
-#> 20 choicechoice6 coml5     -0.00982 0.124
+#>         category     betas estimate    se
+#> 1  choicechoice2 intercept  -1.1007 0.148
+#> 2  choicechoice2   college  -0.1320 0.149
+#> 3  choicechoice2      hsg2   0.4519 0.139
+#> 4  choicechoice2     coml5  -0.3114 0.138
+#> 5  choicechoice3 intercept   0.4781 0.078
+#> 6  choicechoice3   college  -0.0028 0.079
+#> 7  choicechoice3      hsg2  -0.0961 0.081
+#> 8  choicechoice3     coml5  -0.1136 0.068
+#> 9  choicechoice4 intercept  -0.9154 0.132
+#> 10 choicechoice4   college  -0.1400 0.131
+#> 11 choicechoice4      hsg2   0.5685 0.121
+#> 12 choicechoice4     coml5  -0.1660 0.120
+#> 13 choicechoice5 intercept   0.6237 0.074
+#> 14 choicechoice5   college  -0.1612 0.074
+#> 15 choicechoice5      hsg2  -0.0458 0.077
+#> 16 choicechoice5     coml5   0.0932 0.065
+#> 17 choicechoice6 intercept  -0.9013 0.132
+#> 18 choicechoice6   college  -0.3928 0.132
+#> 19 choicechoice6      hsg2   0.5126 0.130
+#> 20 choicechoice6     coml5  -0.0098 0.124
 
 ## predicted probability
 prob <- predict(fit)
@@ -107,27 +105,26 @@ head(japan)
 #> 5  75  50  50   0   male         4  52
 #> 6  50  75  50  50 female         3  31
 
+# prepare datainput
 Y <- japan %>% select(LDP, NFP, SKG, JCP) %>% data.matrix()
 X <- japan %>% select(gender, education, age) %>% data.matrix()
 
 set.seed(1234)
 fit <- emlogit(Y = Y, X = X)
 summary(fit)
-#> # A tibble: 12 x 4
-#>    category betas     estimate      se
-#>    <chr>    <chr>        <dbl>   <dbl>
-#>  1 JCP      intercept -0.600   0.974  
-#>  2 JCP      gender     0.0778  0.316  
-#>  3 JCP      education  0.0314  0.162  
-#>  4 JCP      age       -0.00823 0.0129 
-#>  5 NFP      intercept  0.564   0.698  
-#>  6 NFP      gender    -0.165   0.228  
-#>  7 NFP      education -0.0198  0.122  
-#>  8 NFP      age       -0.00567 0.00943
-#>  9 SKG      intercept -0.214   0.766  
-#> 10 SKG      gender    -0.0710  0.249  
-#> 11 SKG      education  0.0578  0.130  
-#> 12 SKG      age       -0.00189 0.0103
+#>    category     betas estimate     se
+#> 1       JCP intercept  -0.5997 0.9744
+#> 2       JCP    gender   0.0777 0.3161
+#> 3       JCP education   0.0314 0.1616
+#> 4       JCP       age  -0.0082 0.0129
+#> 5       NFP intercept   0.5641 0.6982
+#> 6       NFP    gender  -0.1651 0.2284
+#> 7       NFP education  -0.0198 0.1220
+#> 8       NFP       age  -0.0057 0.0094
+#> 9       SKG intercept  -0.2141 0.7655
+#> 10      SKG    gender  -0.0710 0.2494
+#> 11      SKG education   0.0578 0.1296
+#> 12      SKG       age  -0.0019 0.0103
 
 pred <- predict(fit)
 ```

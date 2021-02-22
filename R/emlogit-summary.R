@@ -6,8 +6,9 @@
 #' @export
 print.summary.emlogit <- function(obj) {
   # print(obj)
-  print_tbl <- getFromNamespace("print.tbl", "tibble")
-  print_tbl(obj)
+  # print_tbl <- getFromNamespace("print.tbl", "tibble")
+  # print_tbl(obj)
+  print(as.data.frame(obj), digits = 2)
   invisible(obj)
 }
 
