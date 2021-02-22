@@ -12,6 +12,26 @@ print.summary.emlogit <- function(obj) {
   invisible(obj)
 }
 
+#' Coef function
+#' @inheritParams summary.emlogit
+#' @export
+coef.emlogit <- function(object) {
+  # Names of the output levels
+  if (is.null(object$y_name))
+    colnames(object$coef) <- paste("`", 1:ncol(object$coef), "`", sep = "")
+  else
+    colnames(object$coef) <- object$y_name
+
+  # Names of the covariates
+  if (is.null(object$x_name)) {
+    rownames(object$coef) <- 1:nrow(object$coef)
+  } else {
+    if (isTRUE(object$control$intercept)) object$x_name[1] <- "intercept"
+    rownames(object$coef) <- object$x_name
+  }
+
+  return(object$coef)
+}
 
 #' Summary function
 #' @param obj An object class of \code{"emlogit.est"}
@@ -25,24 +45,16 @@ summary.emlogit <- function(obj) {
     ## create a matrix of se
     se_mat <- sqrt(obj$var)
 
-
     ## create a long coef
     if (is.null(obj$y_name)) {
-      colnames(obj$coef) <- paste("`", 1:ncol(obj$coef), "`", sep = "")
       colnames(se_mat)   <- paste("`", 2:ncol(obj$coef), "`", sep = "")
     } else {
-      colnames(obj$coef) <- obj$y_name
       colnames(se_mat)   <- obj$y_name[-1]
     }
 
-    if (is.null(obj$x_name)) {
-      coef_name <- 1:nrow(obj$coef)
-    } else {
-      if (isTRUE(obj$control$intercept)) obj$x_name[1] <- "intercept"
-      coef_name <- obj$x_name
-    }
+    coef_name <- rownames(coef(obj))
 
-    coef_long <- tibble::as_tibble(obj$coef[,-1, drop=FALSE]) %>%
+    coef_long <- tibble::as_tibble(coef(obj)[,-1, drop=FALSE]) %>%
       mutate(betas = coef_name) %>%
       tidyr::pivot_longer(-betas, names_to = "category", values_to = "estimate")
 
