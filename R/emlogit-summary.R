@@ -14,23 +14,23 @@ print.summary.emlogit <- function(obj) {
 
 #' Coef function
 #' @inheritParams summary.emlogit
-#'
-coef.emlogit <- function(obj) {
+#' @export
+coef.emlogit <- function(object) {
   # Names of the output levels
-  if (is.null(obj$y_name))
-    colnames(obj$coef) <- paste("`", 1:ncol(obj$coef), "`", sep = "")
+  if (is.null(object$y_name))
+    colnames(object$coef) <- paste("`", 1:ncol(object$coef), "`", sep = "")
   else
-    colnames(obj$coef) <- obj$y_name
+    colnames(object$coef) <- object$y_name
 
   # Names of the covariates
-  if (is.null(obj$x_name)) {
-    rownames(obj$coef) <- 1:nrow(obj$coef)
+  if (is.null(object$x_name)) {
+    rownames(object$coef) <- 1:nrow(object$coef)
   } else {
-    if (isTRUE(obj$control$intercept)) obj$x_name[1] <- "intercept"
-    rownames(obj$coef) <- obj$x_name
+    if (isTRUE(object$control$intercept)) object$x_name[1] <- "intercept"
+    rownames(object$coef) <- object$x_name
   }
 
-  obj$coef
+  return(object$coef)
 }
 
 #' Summary function
