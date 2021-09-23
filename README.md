@@ -13,10 +13,7 @@ status](https://github.com/soichiroy/emlogit/workflows/R-CMD-check/badge.svg)](h
 Conditional-Maximization (ECM) algorithm for the multinomial logistic
 regression.
 
-## Table of Contents
 
-| [Installation](#installation) | [Examples](#examples) | [References](#references) |
-| ----------------------------- | --------------------- | ------------------------- |
 
 ## Installation
 
